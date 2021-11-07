@@ -18,3 +18,5 @@
 - Bootstrap을 활용한 프로젝트 전체 화면 구성
 <br><br>
 ### 2. 메인(홈)
+![메인](https://user-images.githubusercontent.com/80368534/140639692-3fb3b90f-2c27-43cf-80a3-2cb1464cce39.PNG)
+- 
