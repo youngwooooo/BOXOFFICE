@@ -1,0 +1,70 @@
+package common.handler;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.omg.PortableServer.REQUEST_PROCESSING_POLICY_ID;
+
+import common.service.AtchFileServiceImpl;
+import common.service.IAtchFileService;
+import common.vo.AtchFileVO;
+
+public class FileDownloadHandler implements CommandHandler {
+
+	private IAtchFileService fileService = AtchFileServiceImpl.getInstance();
+	
+	@Override
+	public boolean isRedirect(HttpServletRequest req) {
+		
+		return false;
+	}
+
+	@Override
+	public String process(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		
+		long fileId = req.getParameter("fileId") != null ? 
+				Long.parseLong(req.getParameter("fileId")) : -1;
+		
+		int fileSn = req.getParameter("fileSn") != null ?
+				Integer.parseInt(req.getParameter("fileSn")) : 1;
+		
+		// 파일 정보 조회
+		AtchFileVO atchFileVO = new AtchFileVO();
+		atchFileVO.setAtchFileCd(fileId);
+		atchFileVO.setFileSn(fileSn);
+		atchFileVO = fileService.getAtchFileDetail(atchFileVO);
+		
+		// 파일 다운로드 처리를 위한 응답헤더 정보 설정하기
+		resp.setContentType("application/octet-stream");
+		//어떤 파일이든, 확장자든 일단 다운로드 받을 수 있는 마임 타입 : application/octet-stream
+		
+		//파일명이 한글일 경우 깨질 수 있으므로 encoding처리
+		String fileName = URLEncoder.encode(atchFileVO.getFileOrignName(), "UTF-8");
+		
+		// +문자 공백으로 바꿔주기
+		//파일명에 공백문자( )를 넣었을 시, 다운로드하면 +문자로 보이게 되는데, 그걸 바꿔주는 작업
+		fileName.replaceAll("\\+", "%20"); //퍼센트코드값으로 바꿔주기 위해 %20, 모든 게 다 퍼센트 코딩으로 되어있는 형태(원래 허용 문자인 영어,숫자 제외)
+		resp.setHeader("Content-Disposition", "attachment; filename=\""+ fileName + "\"");
+		System.out.println("===================>" + atchFileVO.getFileStoreName());
+		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(atchFileVO.getFilePath()));
+		BufferedOutputStream bos = new BufferedOutputStream(resp.getOutputStream());
+		
+		int c = 0;
+		while((c = bis.read()) != -1) {
+			bos.write(c);
+		}
+		
+		bis.close();
+		bos.close();
+				
+		return null;
+		//뷰페이지가 없으면 null반환, 뷰페이지가 있으면 뷰페이지(링크) 반환
+		//아까 html에서 봤던 내용 같다, 웹컨트롤러에서 "// VIEW 화면 처리하기" 확인하기
+	}
+
+}

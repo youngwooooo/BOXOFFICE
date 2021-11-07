@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="charge">
+	
+	<resultMap class="common.vo.CdChargeVO" id="cdChargeMap">
+		<result property="chgChargeCd" column="CHARGE_CD"/>
+		<result property="chgWeekendYn" column="WEEKEND_YN"/>
+		<result property="cdName1" column="CD_NAME1"/>
+		<result property="cdName2" column="CD_NAME2"/>
+		<result property="cdName3" column="CD_NAME3"/>
+		<result property="cdName4" column="CD_NAME4"/>
+		<result property="chgPrice" column="PRICE"/>
+	</resultMap>
+
+	<select id="retrieveChargeList" resultMap="cdChargeMap">
+	 
+		select SS.*
+		  from
+				(select S.*, rownum as rnum
+		           from 
+		           (SELECT CHARGE_CD 
+		           		 , DECODE(WEEKEND_YN, 'N', '주중', 'Y', '주말', '0') AS WEEKEND_YN
+					     , FN_GETCODENAME('A02', AUDIENCE_CD) AS CD_NAME1
+					     , FN_GETCODENAME('A03', TIME_CD) AS CD_NAME2
+					     , FN_GETCODENAME('A04', SEAT_CD) AS CD_NAME3
+					     , FN_GETCODENAME('A05', SCREEN_CD) AS CD_NAME4
+					     , PRICE
+				  	  FROM TB_CHARGE) S
+				  ORDER BY CHARGE_CD) SS
+ 		 where SS.rnum between #firstRecNo# AND #lastRecNo#
+ 		 		  
+	</select>
+	
+	<select id="getTotalCnt" resultClass="int">
+	
+		select count(*) as cnt from TB_CHARGE
+		
+	</select>
+	
+	<select id="retrieveCharge" parameterClass="common.vo.CdChargeVO" resultMap="cdChargeMap">
+		SELECT CHARGE_CD 
+           	 , WEEKEND_YN
+			 , AUDIENCE_CD AS CD_NAME1
+			 , TIME_CD AS CD_NAME2
+			 , SEAT_CD AS CD_NAME3
+			 , SCREEN_CD AS CD_NAME4
+			 , PRICE
+		  FROM TB_CHARGE
+		 WHERE CHARGE_CD = #chgChargeCd#
+	</select>
+	
+	<select id="retrieveMaxChargeCode" parameterClass="common.vo.CdChargeVO" resultClass="String">
+		SELECT MAX(CHARGE_CD)
+		  FROM TB_CHARGE
+	</select>
+	
+	<insert id="createCharge" parameterClass="common.vo.CdChargeVO">
+		INSERT INTO TB_CHARGE (CHARGE_CD 
+		           		 , WEEKEND_YN 
+						 , AUDIENCE_CD 
+						 , TIME_CD 
+						 , SEAT_CD 
+						 , SCREEN_CD 
+					     , PRICE)
+		VALUES ( #chgChargeCd#
+			  , #chgWeekendYn#
+			  , #cdName1#
+			  , #cdName2#
+			  , #cdName3#
+			  , #cdName4#
+			  , #chgPrice#)
+	</insert>
+	
+	<update id="modifyCharge" parameterClass="common.vo.CdChargeVO">
+		UPDATE TB_CHARGE
+		SET WEEKEND_YN = #chgWeekendYn#
+		  , AUDIENCE_CD = #cdName1#
+		  , TIME_CD = #cdName2#
+		  , SEAT_CD = #cdName3#
+		  , SCREEN_CD = #cdName4#
+		  , PRICE = #chgPrice#
+		WHERE CHARGE_CD = #chgChargeCd#
+	</update>
+	
+	<delete id="deleteCharge" parameterClass="common.vo.CdChargeVO">
+		DELETE FROM TB_CHARGE
+		WHERE CHARGE_CD = #chgChargeCd#
+	</delete>
+	
+		
+</sqlMap>			

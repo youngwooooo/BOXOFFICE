@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="memberProduct">
+	
+	<resultMap class="common.vo.MemberProductVO" id="MemberProductMap">
+		<result property="prodCd" column="PROD_CD"/>
+		<result property="prodName" column="PROD_NAME"/>
+		<result property="prodPrice" column="PROD_PRICE"/>
+		<result property="prodTypeCd" column="PROD_TYPE_CD"/>
+		<result property="prodDesc" column="PROD_DESC"/>
+<!-- 		<result property="atchFileCd" column="ATCH_FILE_CD"/> -->
+		<result property="fileStoreName" column="FILE_STORE_NAME"/>
+	</resultMap>
+
+	<select id="getProductDetail" resultMap="MemberProductMap">
+		SELECT *
+		FROM TB_PRODUCT A, TB_ATCH_FILE_DETAIL B
+		WHERE A.ATCH_FILE_CD = B.ATCH_FILE_CD
+		AND A.PROD_CD = #prodCd#
+	</select>
+	
+	<select id="memberProductList" resultMap="MemberProductMap">
+		SELECT A.PROD_TYPE_CD, A.PROD_CD, A.PROD_NAME, A.PROD_DESC, A.PROD_PRICE, B.FILE_STORE_NAME
+		FROM TB_PRODUCT A, TB_ATCH_FILE_DETAIL B
+		WHERE A.ATCH_FILE_CD = B.ATCH_FILE_CD
+	</select>
+	
+	
+</sqlMap>			

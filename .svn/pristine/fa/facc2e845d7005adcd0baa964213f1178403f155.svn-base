@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="cinema">
+	
+	<!-- map 모음 -->
+	<resultMap class="common.vo.CodeVO" id="codeMap">
+		<result property="groupCd" column="GROUP_CD"/>
+		<result property="groupCdName" column="GROUP_CD_NAME"/>
+		<result property="cd" column="CD"/>
+		<result property="cdName" column="CD_NAME"/>
+		<result property="cdDesc" column="CD_DESC"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.CinemaVO" id="cinemaMap">
+		<result property="cinemaCd" column="CINEMA_CD"/>       
+		<result property="cinemaName" column="CINEMA_NAME"/>
+		<result property="cinemaOpenDate" column="CINEMA_OPEN_DATE"/>
+		<result property="cinemaZip" column="CINEMA_ZIP"/>
+		<result property="cinemaAddr1" column="CINEMA_ADDR1"/>
+		<result property="cinemaAddr2" column="CINEMA_ADDR2"/>
+		<result property="cinemaTel" column="CINEMA_TEL"/>
+		<result property="cinemaStatusCd" column="CINEMA_STATUS_CD"/>
+		<result property="mapX" column="MAP_X"/>
+		<result property="mapY" column="MAP_Y"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.TheaterVO" id="TheaterMap">
+		<result property="theaterCd" column="THEATER_CD"/>
+		<result property="cinemaCd" column="CINEMA_CD"/>
+		<result property="theaterNo" column="THEATER_NO"/>
+		<result property="screenCd" column="SCREEN_CD"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+		<result property="rowCount" column="ROW_COUNT"/>
+		<result property="colCount" column="COL_COUNT"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.SeatVO" id="SeatMap">
+		<result property="seatCd" column="SEAT_CD"/>
+		<result property="theaterCd" column="THEATER_CD"/>
+		<result property="seatNo" column="SEAT_NO"/>
+		<result property="seatTypeCd" column="SEAT_TYPE_CD"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+	</resultMap>
+	
+	
+	<!-- 코드 조회 -->
+	<select id="retrieveCodeList" resultMap="codeMap">
+		SELECT GROUP_CD
+			 , GROUP_CD_NAME
+			 , CD
+			 , CD_NAME
+			 , CD_DESC
+			 , DELETE_YN
+		FROM TB_CODE
+		WHERE GROUP_CD IN ('A05', 'A07')
+	</select>
+	
+	<!-- 극장 이름으로 코드 조회 -->
+	<select id="retrieveCinemaCode" parameterClass="String" resultClass="String">
+		SELECT CINEMA_CD
+		FROM TB_CINEMA
+		WHERE CINEMA_NAME = #cinemaName#
+	</select>
+	
+	<!-- 극장 코드 최댓값 추출 -->
+	<select id="retrieveMaxCinemaCode" resultClass="int">
+		SELECT MAX(TO_NUMBER(SUBSTR(CINEMA_CD, 3)))
+		FROM TB_CINEMA
+	</select>
+	
+	<!-- 상영관 코드 최댓값 추출 -->
+	<select id="retrieveMaxTheaterCode" resultClass="int">
+		SELECT MAX(TO_NUMBER(SUBSTR(THEATER_CD, 3)))
+		FROM TB_THEATER
+	</select>
+	
+	<!-- 좌석 코드 최댓값 추출 -->
+	<select id="retrieveMaxSeatCode" resultClass="int">
+		SELECT MAX(TO_NUMBER(SUBSTR(SEAT_CD, 3)))
+		FROM TB_SEAT
+	</select>
+	
+	<!-- 극장 목록 조회 -->
+	<select id="retrieveCinemaList" resultMap="cinemaMap">
+		SELECT CINEMA_CD
+			 , CINEMA_NAME
+			 , TO_CHAR(CINEMA_OPEN_DATE, 'YYYY/MM/DD') AS CINEMA_OPEN_DATE
+			 , CINEMA_ZIP
+			 , CINEMA_ADDR1
+			 , CINEMA_ADDR2
+			 , CINEMA_TEL
+			 , CINEMA_STATUS_CD
+			 , MAP_X
+			 , MAP_Y
+		FROM TB_CINEMA
+	</select>
+	
+	<!-- 극장 조회 -->
+	<select id="retrieveCinema" parameterClass="String" resultMap="cinemaMap">
+		SELECT CINEMA_CD
+			 , CINEMA_NAME
+			 , TO_CHAR(CINEMA_OPEN_DATE, 'YYYY/MM/DD') AS CINEMA_OPEN_DATE
+			 , CINEMA_ZIP
+			 , CINEMA_ADDR1
+			 , CINEMA_ADDR2
+			 , CINEMA_TEL
+			 , CINEMA_STATUS_CD
+			 , MAP_X
+			 , MAP_Y
+		FROM TB_CINEMA
+		WHERE CINEMA_CD = #cinemaCd#
+	</select>
+	
+	<!-- 상영관 목록 조회 -->
+	<select id="retrieveTheaterList" parameterClass="String" resultMap="TheaterMap">
+		SELECT THEATER_CD
+			 , CINEMA_CD
+			 , THEATER_NO
+			 , SCREEN_CD
+			 , DELETE_YN
+			 , ROW_COUNT
+			 , COL_COUNT
+		FROM TB_THEATER
+		WHERE CINEMA_CD = #cinemaCd#
+		ORDER BY THEATER_NO
+	</select>
+	
+	<!-- 상영관 조회 -->
+	<select id="retrieveTheater" parameterClass="String" resultMap="TheaterMap">
+		SELECT THEATER_CD
+			 , CINEMA_CD
+			 , THEATER_NO
+			 , SCREEN_CD
+			 , DELETE_YN
+			 , ROW_COUNT
+			 , COL_COUNT
+		FROM TB_THEATER
+		WHERE CINEMA_CD = #theaterCd#
+	</select>
+	
+	<!-- 상영관 개수 조회 -->
+	<select id="retrieveTheaterCount" parameterClass="String" resultClass="int">
+		SELECT COUNT(T.THEATER_CD) 
+		FROM TB_CINEMA C, TB_THEATER T
+		WHERE C.CINEMA_CD = T.CINEMA_CD
+		  AND T.CINEMA_CD = #cinemaCd#
+	</select>
+	
+	<!-- 좌석 목록 조회 -->
+	<select id="retrieveSeatList" parameterClass="String" resultMap="SeatMap">
+		SELECT SEAT_CD
+		     , THEATER_CD
+		     , SEAT_NO
+		     , SEAT_TYPE_CD
+		     , DELETE_YN
+		FROM TB_SEAT
+		WHERE THEATER_CD = #theaterCd#
+		ORDER BY TO_NUMBER(SUBSTR(SEAT_CD, 3))
+	</select>
+	
+	<!-- 극장 등록 -->
+	<insert id="createCinema" parameterClass="common.vo.CinemaVO">
+		INSERT INTO TB_CINEMA (CINEMA_CD
+							 , CINEMA_NAME
+							 , CINEMA_OPEN_DATE
+							 , CINEMA_ZIP
+							 , CINEMA_ADDR1
+							 , CINEMA_ADDR2
+							 , CINEMA_TEL
+							 , CINEMA_STATUS_CD
+							 , MAP_X
+							 , MAP_Y)
+		VALUES (#cinemaCd#
+			  , #cinemaName#
+			  , TO_DATE(#cinemaOpenDate#, 'YYYYMMDD')
+			  , #cinemaZip#
+			  , #cinemaAddr1#
+			  , #cinemaAddr2#
+			  , #cinemaTel#
+			  , #cinemaStatusCd#
+			  , #mapX#
+			  , #mapY#)
+	</insert>
+	
+	<!-- 상영관 등록 -->
+	<insert id="createTheater" parameterClass="common.vo.TheaterVO">
+		INSERT INTO TB_THEATER (THEATER_CD
+							  , CINEMA_CD
+							  , THEATER_NO
+							  , SCREEN_CD
+							  , DELETE_YN
+							  , ROW_COUNT
+							  , COL_COUNT)
+		VALUES (#theaterCd#
+			  , #cinemaCd#
+			  , #theaterNo#
+			  , #screenCd#
+			  , #deleteYn#
+			  , #rowCount#
+			  , #colCount#)
+	</insert>
+	
+	<!-- 좌석 등록 -->
+	<insert id="createSeat" parameterClass="common.vo.SeatVO">
+		INSERT INTO TB_Seat (SEAT_CD
+						   , THEATER_CD
+						   , SEAT_NO
+						   , SEAT_TYPE_CD
+						   , DELETE_YN)
+		VALUES (#seatCd#
+			  , #theaterCd#
+			  , #seatNo#
+			  , #seatTypeCd#
+			  , #deleteYn#)
+	</insert>
+	
+	<!-- 좌석 한 번에 등록 -->
+	<insert id="createSeatAll" parameterClass="String">
+		$sql$
+	</insert>
+	
+	<!-- 극장 삭제 -->
+	<delete id="deleteCinema" parameterClass="String">
+		DELETE FROM TB_CINEMA
+		WHERE CINEMA_CD = #cinemaCd#
+	</delete>
+	
+	<!-- 상영관 삭제 (극장 코드로) -->
+	<delete id="deleteTheater" parameterClass="String">
+		DELETE FROM TB_THEATER
+		WHERE CINEMA_CD = #cinemaCd#
+	</delete>
+	
+	<!-- 상영관 삭제 (상영관 코드로) -->
+	<delete id="deleteTheaterByTheaterCd" parameterClass="String">
+		DELETE FROM TB_THEATER
+		WHERE THEATER_CD = #theaterCd#
+	</delete>
+	
+	<!-- 좌석 삭제 -->
+	<delete id="deleteSeat" parameterClass="String">
+		DELETE FROM TB_SEAT
+		WHERE THEATER_CD = #theaterCd#
+	</delete>
+	
+	<!-- 좌석 사용여부 변경 -->
+	<update id="modifySeatDeleteYn" parameterClass="common.vo.SeatVO">
+		UPDATE TB_SEAT
+		SET DELETE_YN = #deleteYn#
+		WHERE SEAT_CD = #seatCd#
+	</update>
+	
+	<!-- 극장 정보 수정 -->
+	<update id="modifyCinema" parameterClass="common.vo.CinemaVO">
+		UPDATE TB_CINEMA
+		SET CINEMA_OPEN_DATE = TO_DATE(#cinemaOpenDate#, 'YYYYMMDD')
+		  , CINEMA_ZIP = #cinemaZip#
+		  , CINEMA_ADDR1 = #cinemaAddr1#
+		  , CINEMA_ADDR2 = #cinemaAddr2#
+		  , CINEMA_TEL = #cinemaTel#
+		  , CINEMA_STATUS_CD = #cinemaStatusCd#
+		  , MAP_X = #mapX#
+		  , MAP_Y = #mapY#
+		WHERE CINEMA_CD = #cinemaCd#
+	</update>
+	
+	<!-- 상영관 정보 수정 -->
+	<update id="modifyTheater" parameterClass="common.vo.TheaterVO">
+		UPDATE TB_THEATER
+		SET THEATER_NO = #theaterNo#
+		  , SCREEN_CD = #screenCd#
+		  , DELETE_YN = #deleteYn#
+		  , ROW_COUNT = #rowCount#
+		  , COL_COUNT =  #colCount#
+		WHERE THEATER_CD = #theaterCd#
+	</update>
+	
+</sqlMap>			

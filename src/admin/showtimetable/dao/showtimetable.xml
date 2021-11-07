@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="showtimetable">
+	
+	<resultMap class="common.vo.ShowTimetableVO" id="showtimetableMap">
+		<result property="mvCd" column="MV_CD"/>
+		<result property="mvNameKor" column="MV_NAME_KOR"/>
+		<result property="showStartTime" column="SHOW_START_TIME"/>
+	</resultMap>
+
+	<select id="retrieveShowTimetableList" resultMap="showtimetableMap" parameterClass="common.vo.ShowTimetableVO">
+
+<!-- 		SELECT A.MV_CD AS MV_CD, MV_NAME_KOR, SHOW_START_TIME -->
+<!-- 		  FROM TB_SHOW A, TB_MOVIE B, TB_THEATER C -->
+<!-- 		 WHERE A.MV_CD = B.MV_CD -->
+<!-- 		   AND A.THEATER_CD = C.THEATER_CD -->
+<!-- 		   AND TO_CHAR(SHOW_DATE, 'YYYY-MM-DD (DY)') = '2021-06-22 (화)' -->
+<!-- 		   AND A.THEATER_CD IN (SELECT THEATER_CD -->
+<!-- 		                          FROM TB_THEATER -->
+<!-- 		                         WHERE CINEMA_CD = 'CN001') -->
+<!-- 		 ORDER BY A.MV_CD, SHOW_START_TIME; -->
+
+		SELECT A.MV_CD AS MV_CD, MV_NAME_KOR, SHOW_START_TIME
+		  FROM TB_SHOW A, TB_MOVIE B, TB_THEATER C
+		 WHERE A.MV_CD = B.MV_CD
+		   AND A.THEATER_CD = C.THEATER_CD
+		   AND TO_CHAR(SHOW_DATE, 'YYYY.MM.DD (DY)') = #showDate#
+		   AND A.THEATER_CD IN (SELECT THEATER_CD
+		                          FROM TB_THEATER
+		                         WHERE CINEMA_CD = #cinemaCd#)
+		 ORDER BY A.MV_CD, SHOW_START_TIME
+
+	</select>
+
+<!-- 	<select id="retrieveShowTimetable" parameterClass="common.vo.ShowTimetableVO" resultMap="showtimetableMap"> -->
+<!-- 		SELECT GROUP_CD -->
+<!-- 			 , GROUP_CD_NAME -->
+<!-- 			 , CD -->
+<!-- 			 , CD_NAME -->
+<!-- 			 , CD_DESC -->
+<!-- 			 , DELETE_YN -->
+<!-- 		FROM TB_CODE -->
+<!-- 		WHERE GROUP_CD = 'A04' -->
+<!-- 		  AND CD = #cd# -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="retrieveMaxShowTimetableCode" parameterClass="common.vo.ShowTimetableVO" resultClass="int"> -->
+<!-- 		SELECT MAX(TO_NUMBER(CD)) -->
+<!-- 		FROM TB_CODE -->
+<!-- 		WHERE GROUP_CD = 'A04' -->
+<!-- 	</select> -->
+	
+<!-- 	<insert id="createShowTimetable" parameterClass="common.vo.ShowTimetableVO"> -->
+<!-- 		INSERT INTO TB_CODE (GROUP_CD -->
+<!-- 						   , GROUP_CD_NAME -->
+<!-- 						   , CD -->
+<!-- 						   , CD_NAME -->
+<!-- 						   , CD_DESC -->
+<!-- 						   , DELETE_YN) -->
+<!-- 		VALUES ('A04' -->
+<!-- 			  , '좌석유형' -->
+<!-- 			  , #cd# -->
+<!-- 			  , #cdName# -->
+<!-- 			  , #cdDesc# -->
+<!-- 			  , #deleteYn#) -->
+<!-- 	</insert> -->
+	
+<!-- 	<update id="modifyShowTimetable" parameterClass="common.vo.ShowTimetableVO"> -->
+<!-- 		UPDATE TB_CODE -->
+<!-- 		SET CD_NAME = #cdName# -->
+<!-- 		  , CD_DESC = #cdDesc# -->
+<!-- 		  , DELETE_YN = #deleteYn# -->
+<!-- 		WHERE GROUP_CD = 'A04' -->
+<!-- 		  AND CD = #cd# -->
+<!-- 	</update> -->
+	
+<!-- 	<delete id="deleteShowTimetable" parameterClass="common.vo.ShowTimetableVO"> -->
+<!-- 		DELETE FROM TB_CODE -->
+<!-- 		WHERE GROUP_CD = 'A04' -->
+<!-- 		  AND CD = #cd# -->
+<!-- 	</delete> -->
+	
+</sqlMap>			

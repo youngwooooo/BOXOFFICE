@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="screen">
+	
+	<resultMap class="common.vo.CodeVO" id="screenMap">
+		<result property="groupCd" column="GROUP_CD"/>
+		<result property="groupCdName" column="GROUP_CD_NAME"/>
+		<result property="cd" column="CD"/>
+		<result property="cdName" column="CD_NAME"/>
+		<result property="cdDesc" column="CD_DESC"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+	</resultMap>
+
+	<select id="retrieveScreenList" resultMap="screenMap">
+		SELECT GROUP_CD
+			 , GROUP_CD_NAME
+			 , CD
+			 , CD_NAME
+			 , CD_DESC
+			 , DELETE_YN
+		FROM TB_CODE
+		WHERE GROUP_CD = 'A05'
+	</select>
+
+	<select id="retrieveScreen" parameterClass="common.vo.CodeVO" resultMap="screenMap">
+		SELECT GROUP_CD
+			 , GROUP_CD_NAME
+			 , CD
+			 , CD_NAME
+			 , CD_DESC
+			 , DELETE_YN
+		FROM TB_CODE
+		WHERE GROUP_CD = 'A05'
+		  AND CD = #cd#
+	</select>
+	
+	<select id="retrieveMaxScreenCode" parameterClass="common.vo.CodeVO" resultClass="int">
+		SELECT MAX(TO_NUMBER(CD))
+		FROM TB_CODE
+		WHERE GROUP_CD = 'A05'
+	</select>
+	
+	<insert id="createScreen" parameterClass="common.vo.CodeVO">
+		INSERT INTO TB_CODE (GROUP_CD
+						   , GROUP_CD_NAME
+						   , CD
+						   , CD_NAME
+						   , CD_DESC
+						   , DELETE_YN)
+		VALUES ('A05'
+			  , '스크린유형'
+			  , #cd#
+			  , #cdName#
+			  , #cdDesc#
+			  , #deleteYn#)
+	</insert>
+	
+	<update id="modifyScreen" parameterClass="common.vo.CodeVO">
+		UPDATE TB_CODE
+		SET CD_NAME = #cdName#
+		  , CD_DESC = #cdDesc#
+		  , DELETE_YN = #deleteYn#
+		WHERE GROUP_CD = 'A05'
+		  AND CD = #cd#
+	</update>
+	
+	<delete id="deleteScreen" parameterClass="common.vo.CodeVO">
+		DELETE FROM TB_CODE
+		WHERE GROUP_CD = 'A05'
+		  AND CD = #cd#
+	</delete>
+	
+</sqlMap>			

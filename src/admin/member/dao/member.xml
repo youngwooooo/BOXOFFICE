@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="member"> 
+	
+	<resultMap class="common.vo.MemberVO" id="memberMap">
+		<result property="memCd"        column="MEM_CD"/>
+		<result property="memName"        column="MEM_NAME"/>
+		<result property="memId"        column="MEM_ID"/>
+		<result property="memPass"        column="MEM_PASS"/>
+		<result property="memHp"        column="MEM_HP"/>
+		<result property="memMail"        column="MEM_MAIL"/>
+		<result property="memBir"        column="MEM_BIR"/>
+		<result property="memZip"        column="MEM_ZIP"/>
+		<result property="memAddr1"        column="MEM_ADDR1"/>
+		<result property="memAddr2"        column="MEM_ADDR2"/>
+		<result property="msCd"        		column="MS_CD"/>
+		<result property="memMileage"        column="MEM_MILEAGE"/>
+		<result property="joinDate"        column="JOIN_DATE"/>
+		<result property="managerYn"        column="MANAGER_YN"/>
+		<result property="deleteYn"        column="DELETE_YN"/>
+<!-- 		<result property="memImg"        column="MEM_IMG"/> -->
+		<result property="rn" 		 column="rn"/>
+		<result property="msName"        column="MS_NAME"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.DetailMemberVO" id="DetailMemberMap">
+		<result property="memCd"  	column="MEM_CD"/>
+		<result property="memName"  column="MEM_NAME"/>
+		<result property="memId"  	column="MEM_ID"/>
+		<result property="memHp"  	column="MEM_HP"/>
+		<result property="memMail"  column="MEM_MAIL"/>
+		<result property="memBir"  	column="MEM_BIR"/>
+		<result property="memZip"  	column="MEM_ZIP"/>
+		<result property="memAddr1"  column="MEM_ADDR1"/>
+		<result property="memAddr2"  column="MEM_ADDR2"/>
+		<result property="msCd"  		column="MS_CD"/>
+		<result property="memMileage"  column="MEM_MILEAGE"/>
+		<result property="joinDate"  	column="JOIN_DATE"/>
+		<result property="managerYn"  	column="MANAGER_YN"/>
+		<result property="deleteYn"  	column="DELETE_YN"/>
+		<result property="msName"  		column="MS_NAME"/>
+		<result property="cdName"  		column="CD_NAME"/>
+		<result property="genreCd" 		 column="GENRE_CD"/>
+	</resultMap>
+	
+		<resultMap class="common.vo.MemberVO" id="memberSearched">
+		<result property="memCd"        column="MEM_CD"/>
+		<result property="memName"        column="MEM_NAME"/>
+		<result property="memId"        column="MEM_ID"/>
+		<result property="memPass"        column="MEM_PASS"/>
+		<result property="memHp"        column="MEM_HP"/>
+		<result property="memMail"        column="MEM_MAIL"/>
+		<result property="memBir"        column="MEM_BIR"/>
+		<result property="memZip"        column="MEM_ZIP"/>
+		<result property="memAddr1"        column="MEM_ADDR1"/>
+		<result property="memAddr2"        column="MEM_ADDR2"/>
+		<result property="msCd"        		column="MS_CD"/>
+		<result property="memMileage"        column="MEM_MILEAGE"/>
+		<result property="joinDate"        column="JOIN_DATE"/>
+		<result property="managerYn"        column="MANAGER_YN"/>
+		<result property="deleteYn"        column="DELETE_YN"/>
+<!-- 		<result property="memImg"        column="MEM_IMG"/> -->
+		<result property="msName"        column="MS_NAME"/>
+	</resultMap>
+	
+	<select id="getMemberAllList" resultMap="memberMap">
+		SELECT BB.*, BB.rn
+         FROM
+		 (SELECT AA.*
+		 FROM(SELECT A.*, rownum as rn
+       			 FROM(SELECT TB_MEMBER.*, TB_MEMBERSHIP.MS_NAME
+              			FROM TB_MEMBER, TB_MEMBERSHIP
+                        WHERE TB_MEMBER.MS_CD = TB_MEMBERSHIP.MS_CD
+              			ORDER BY MEM_ID) A) AA
+		 WHERE <![CDATA[ rownum <= #lastRecNo# ]]>) BB
+		 	 
+         WHERE BB.rn <![CDATA[ >= #firstRecNo# ]]> 
+		 
+	</select>
+	
+	<select id="getTotalCnt" resultClass="int">
+		SELECT COUNT(*)
+		FROM TB_MEMBER
+	</select>
+	
+	
+	<select id="getMember" resultMap="DetailMemberMap">
+		SELECT FF.*
+        FROM
+        (SELECT MI.*, CN.CD_NAME
+		FROM
+		(SELECT A.*, B.GENRE_CD, C.MS_NAME
+		FROM TB_MEMBER A, TB_MEMBER_GENRE B, TB_MEMBERSHIP C
+		WHERE A.MEM_CD = B.MEM_CD(+)
+		AND A.MS_CD = C.MS_CD) MI,
+		(SELECT DD.CD, DD.CD_NAME
+		FROM TB_MEMBER AA, TB_MEMBER_GENRE BB, TB_CODE DD
+		WHERE AA.MEM_CD = BB.MEM_CD
+		AND BB.GENRE_CD = DD.CD
+		AND DD.GROUP_CD = 'A06') CN
+		WHERE MI.GENRE_CD = CN.CD(+)) FF
+        WHERE FF.MEM_ID = #memId#
+	</select>
+	
+	<select id="getSearchMember" parameterClass="common.vo.MemberVO" resultMap="memberSearched">
+		SELECT TB_MEMBER.*, TB_MEMBERSHIP.MS_NAME
+		FROM TB_MEMBER, TB_MEMBERSHIP 
+		WHERE 1 = 1 
+		AND TB_MEMBER.MS_CD =  TB_MEMBERSHIP.MS_CD
+		<isNotEmpty property="memCd"> <!-- isNotEmpty : property가 null, not null을 모두 체크해주는 속성 -->
+			AND MEM_CD = #memCd#
+		</isNotEmpty>
+		<isNotEmpty property="memId">
+			AND MEM_ID = #memId# 
+		</isNotEmpty>
+	</select>
+	
+</sqlMap>			
+
+
+
+
+

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="categoryMovie">
+
+	
+	<resultMap class="common.vo.MovieVO" id="MovieMap">
+		
+		<result column="mv_cd" property="mvCd"/>
+		<result column="MV_NAME_KOR" property="mvNameKor"/>
+		<result column="MV_NAME_ENG" property="mvNameEng"/>
+		<result column="MV_REL_DATE" property="mvRelDate"/>
+		<result column="MV_RATING_CD" property="mvRatingCd"/>
+		<result column="MV_RUNNING_TIME" property="mvRunningTime"/>
+		<result column="DIRECTOR" property="director"/>
+		<result column="ACTOR" property="actor"/>
+		<result column="SHOW_YN" property="showYn"/>
+		<result column="MV_PLOT" property="mvPlot"/>
+		<result column="DUBBING_YN" property="dubbingYn"/>
+		<result column="MV_COMPANY" property="mvCompany"/>
+		<result column="MV_COUNTRY" property="mvCountry"/>
+		<result column="MV_SHOW_START_DATE" property="mvShowStartDate"/>
+		<result column="MV_SHOW_END_DATE" property="mvShowEndDate"/>
+		<result column="ATCH_FILE_CD" property="atchFileCd"/>
+		<result column="GROUP_CD" property="groupCd"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.AtchMovieVO" id="AtchMovieMap">
+		<result column="mv_cd" property="mvCd"/>
+		<result column="MV_NAME_KOR" property="mvNameKor"/>
+		<result column="MV_NAME_ENG" property="mvNameEng"/>
+		<result column="MV_REL_DATE" property="mvRelDate"/>
+		<result column="MV_RATING_CD" property="mvRatingCd"/>
+		<result column="MV_RUNNING_TIME" property="mvRunningTime"/>
+		<result column="DIRECTOR" property="director"/>
+		<result column="ACTOR" property="actor"/>
+		<result column="SHOW_YN" property="showYn"/>
+		<result column="MV_PLOT" property="mvPlot"/>
+		<result column="DUBBING_YN" property="dubbingYn"/>
+		<result column="MV_COMPANY" property="mvCompany"/>
+		<result column="MV_COUNTRY" property="mvCountry"/>
+		<result column="MV_SHOW_START_DATE" property="mvShowStartDate"/>
+		<result column="MV_SHOW_END_DATE" property="mvShowEndDate"/>
+		<result column="ATCH_FILE_CD" property="atchFileCd"/>
+		<result column="FILE_SN" property="fileSn"/>
+		<result column="FILE_PATH" property="filePath" />
+		<result column="FILE_STORE_NAME" property="fileStoreName" />
+		<result column="FILE_ORIGN_NAME" property="fileOrignName"/>
+		<result column="FILE_EXTSN" property="fileExtsn"/>
+		<result column="FILE_CONTENT" property="fileContent"/>
+		<result column="FILE_SIZE" property="fileSize" />
+	</resultMap>		
+	
+	<resultMap class="common.vo.CodeVO" id="codeMap1">
+		<result property="groupCd" column="GROUP_CD"/>
+		<result property="cdName" column="CD_NAME"/>
+	</resultMap>
+	
+<!-- 	<resultMap class="common.vo.CodeMovieVO" id="codeMovie">		 -->
+<!-- 		<result column="GROUP_CD" property="groupCd"/> -->
+<!-- 		<result column="GROUP_CD_NAME" property="groupCdName"/> -->
+<!-- 		<result column="CD" property="cd"/> -->
+<!-- 		<result column="CD_NAME" property="cdName"/> -->
+<!-- 		<result column="MV_CD" property="mvCd"/>	 -->
+<!-- 		<result column="MV_NAME_KOR" property="mvNameKor"/>	 -->
+<!-- 		<result column="DIRECTOR" property="director"/>	 -->
+<!-- 		<result column="MV_REL_DATE" property="mvRelDate"/>	 -->
+<!-- 		<result column="ATCH_FILE_CD" property="atchFileCd"/>	 -->
+<!-- 	</resultMap> -->
+	
+	<!-- 장르 테이블 조회 -->
+	<select id="getAllGenreList" resultMap="codeMap1">
+		select * from tb_code where group_cd = 'A06'
+	</select>
+	
+	<!-- 장르 테이블 삽입 -->
+<!-- 	<insert id="insertCodeMovie" parameterClass="common.vo.CodeMovieVO"> -->
+<!-- 		INSERT INTO TB_CODE_MOVIE(*)  -->
+<!-- 		    VALUES('A06', #groupCdName#, #cd#, #cdName#, #mvCd#, #mvNameKor#, #director#, #mvRelDate#, #atchFileCd#) -->
+<!-- 	</insert> -->
+	
+	
+	<select id="getMovie" resultMap="MovieMap">
+		select * from tb_movie where mv_cd = #mvCd#
+	</select>
+	
+
+
+	<!-- 작업중 -->
+	<!-- <select id="getAllCodeMovieList" resultMap="codeMovie">
+		SELECT GROUP_CD, GROUP_CD_NAME, CD, CD_NAME, MV_CD, MV_NAME_KOR, DIRECTOR, MV_REL_DATE, ATCH_FILE_CD
+		    FROM TB_CODE_MOVIE
+	</select> -->
+	
+	<update id="updateMovie" parameterClass="common.vo.MovieVO">
+		
+		update tb_movie
+		set MV_NAME_KOR = #mvNameKor#
+			, MV_NAME_ENG = #mvNameEng#
+			, MV_REL_DATE = #mvRelDate#
+			, MV_RATING_CD = #mvRatingCd#
+			, MV_RUNNING_TIME = #mvRunningTime#
+			, DIRECTOR = #director#
+			, SHOW_YN =  #showYn#
+			, DUBBING_YN = #dubbingYn#
+			, MV_COMPANY = #mvCompany#
+			, MV_SHOW_START_DATE = #mvShowStartDate#
+			, MV_SHOW_END_DATE = #mvShowEndDate#
+			, ATCH_FILE_CD = #atchFileCd#
+			, GROUP_CD = #groupCd#
+		where mv_cd = #mvCd#   
+		
+	</update>
+	
+     <delete id="deleteMovie" parameterClass="String">
+ 	
+ 		delete from tb_movie where mv_cd = #mvCd# 
+ 	
+ 	</delete>
+ 	
+ 	<select id="getAllMovieList" parameterClass="common.vo.MovieVO" resultMap="AtchMovieMap">
+		SELECT
+		    aa.*
+		FROM
+		    (
+		        SELECT
+		            a.*,
+		            ROWNUM AS rnum
+		        FROM
+		            (
+		                SELECT
+		                    a.mv_cd,
+		                    a.mv_name_kor,
+		                    a.mv_name_eng,
+		                    a.mv_rel_date,
+		                    a.mv_rating_cd,
+		                    a.mv_running_time,
+		                    a.director,
+		                    a.actor,
+		                    a.show_yn,
+		                    a.mv_plot,
+		                    a.dubbing_yn,
+		                    a.mv_company,
+		                    a.mv_country,
+                            a.group_cd,
+		                    a.mv_show_start_date,
+		                    a.mv_show_end_date,
+		                    a.atch_file_cd,
+		                    NVL(b.file_sn, 0) file_sn,
+		                    b.file_path,
+		                    b.file_store_name,
+		                    b.file_orign_name,
+		                    b.file_extsn,
+		                    b.file_content,
+		                    NVL(b.file_size, 0) file_size
+		                FROM
+		                    tb_movie a,
+		                    tb_atch_file_detail b
+		                WHERE
+		                    a.atch_file_cd = b.atch_file_cd(+)
+                            AND a.group_cd = #groupCd#
+		            ) a
+		    ) aa
+		WHERE
+		    aa.rnum BETWEEN #firstRecNo# and #lastRecNo#
+		   
+	</select>
+
+ 	
+ 	
+ 	<select id="getTotalCnt" resultClass="int">
+		select count(*) as cnt
+		from tb_movie
+	</select>
+	
+	
+	<select id="getSearchMovie"
+		parameterClass="common.vo.MovieVO" resultMap="MovieMap">
+		select * from tb_movie where 1=1
+		
+		<isNotEmpty property="mvNameKor">
+			and MV_NAME_KOR like '%' ||  #mvNameKor# || '%'
+		</isNotEmpty>
+		<isNotEmpty property="mvNameEng">
+			and MV_NAME_ENG like '%' ||  #mvNameEng# || '%'
+		</isNotEmpty>
+		
+	</select>
+	
+	
+	
+	
+	
+
+</sqlMap>
+ 	

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="signin">
+	
+	<resultMap class="common.vo.MemberVO" id="memberMap">
+		<result property="memCd" column="MEM_CD"/>
+		<result property="memId" column="MEM_ID"/>
+		<result property="memName" column="MEM_NAME"/>
+		<result property="memHp" column="MEM_HP"/>
+		<result property="memMail" column="MEM_MAIL"/>
+		<result property="managerYn" column="MANAGER_YN"/>
+		<result property="memBir" column="MEM_BIR"/>		
+		<result property="memZip" column="MEM_ZIP"/>
+		<result property="memAddr1" column="MEM_ADDR1"/>
+		<result property="memAddr2" column="MEM_ADDR2"/>
+	</resultMap>
+	
+	<select id="retrieveMemberCount" parameterClass="common.vo.MemberVO" resultMap="memberMap">
+		SELECT MEM_CD
+			 , MEM_ID
+			 , MEM_NAME
+			 , MEM_HP
+			 , MEM_MAIL
+			 , MANAGER_YN
+			 , MANAGER_YN
+			 , MEM_BIR
+			 , MEM_ZIP
+			 , MEM_ADDR1
+			 , MEM_ADDR2
+		FROM TB_MEMBER
+		WHERE MEM_ID = #memId#
+		  AND MEM_PASS = #memPass#
+	</select>
+	
+</sqlMap>			

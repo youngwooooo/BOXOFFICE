@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="movieMem">
+
+	
+
+	<insert id="insertMovie" parameterClass="common.vo.MovieVO">
+	
+		INSERT INTO TB_MOVIE 
+		(MV_CD, MV_NAME_KOR, MV_NAME_ENG, MV_REL_DATE, MV_RATING_CD, MV_RUNNING_TIME, DIRECTOR, ACTOR, SHOW_YN, MV_PLOT, DUBBING_YN, MV_COMPANY, MV_COUNTRY ,MV_SHOW_START_DATE, MV_SHOW_END_DATE, ATCH_FILE_CD )
+		VALUES
+		(#mvCd#, #mvNameKor#, #mvNameEng#, #mvRelDate#, #mvRatingCd#, #mvRunningTime#, #director#, #actor#, #showYn#, #mvPlot#, #dubbingYn#, #mvCompany#, #mvCountry#, #mvShowStartDate#, #mvShowEndDate#, #atchFileCd#)
+	
+	</insert>
+	
+	<resultMap class="common.vo.MovieVO" id="MovieMap">
+		
+		<result column="mv_cd" property="mvCd"/>
+		<result column="MV_NAME_KOR" property="mvNameKor"/>
+		<result column="MV_NAME_ENG" property="mvNameEng"/>
+		<result column="MV_REL_DATE" property="mvRelDate"/>
+		<result column="MV_RATING_CD" property="mvRatingCd"/>
+		<result column="MV_RUNNING_TIME" property="mvRunningTime"/>
+		<result column="DIRECTOR" property="director"/>
+		<result column="ACTOR" property="actor"/>
+		<result column="SHOW_YN" property="showYn"/>
+		<result column="MV_PLOT" property="mvPlot"/>
+		<result column="DUBBING_YN" property="dubbingYn"/>
+		<result column="MV_COMPANY" property="mvCompany"/>
+		<result column="MV_COUNTRY" property="mvCountry"/>
+		<result column="MV_SHOW_START_DATE" property="mvShowStartDate"/>
+		<result column="MV_SHOW_END_DATE" property="mvShowEndDate"/>
+		<result column="ATCH_FILE_CD" property="atchFileCd"/>
+	</resultMap>
+
+	
+	<select id="getMovie" resultMap="MovieMap">
+		select * from tb_movie where mv_cd = #mvCd#
+	</select>
+
+	<select id="getAllMovieList" resultMap="MovieMap">
+			select mv_cd, mv_name_kor, director, mv_rel_date, ATCH_FILE_CD
+			from tb_movie
+	</select>
+	
+	<update id="updateMovie" parameterClass="common.vo.MovieVO">
+		
+		update tb_movie
+		set MV_NAME_KOR = #mvNameKor#
+			, MV_NAME_ENG = #mvNameEng#
+			, MV_REL_DATE = #mvRelDate#
+			, MV_RATING_CD = #mvRatingCd#
+			, MV_RUNNING_TIME = #mvRunningTime#
+			, DIRECTOR = #director#
+			, SHOW_YN =  #showYn#
+			, DUBBING_YN = #dubbingYn#
+			, MV_COMPANY = #mvCompany#
+			, MV_SHOW_START_DATE = #mvShowStartDate#
+			, MV_SHOW_END_DATE = #mvShowEndDate#
+			, ATCH_FILE_CD = #atchFileCd#
+		where mv_cd = #mvCd#   
+		
+	</update>
+	
+     <delete id="deleteMovie" parameterClass="String">
+ 	
+ 		delete from tb_movie where mv_cd = #mvCd# 
+ 	
+ 	</delete>
+ 	
+ 	<select id="getMovieAll" resultMap="MovieMap">
+		SELECT AA.*
+			FROM 
+			(Select A.*, rownum as rnum 
+			from
+			(select mv_cd, mv_name_kor, MV_NAME_ENG, mv_rel_date, MV_RATING_CD, MV_RUNNING_TIME, DIRECTOR, ACTOR, SHOW_YN,
+			MV_PLOT, DUBBING_YN, MV_COMPANY, MV_COUNTRY, MV_SHOW_START_DATE, MV_SHOW_END_DATE, ATCH_FILE_CD
+			from tb_movie) A ) AA 
+			where AA.rnum between #firstRecNo# and #lastRecNo# 
+	</select>
+ 	
+ 	
+ 	<select id="getTotalCnt" resultClass="int">
+		select count(*) as cnt
+		from tb_movie
+	</select>
+	
+	
+	<select id="getSearchMovie"
+		parameterClass="common.vo.MovieVO" resultMap="MovieMap">
+		select * from tb_movie where 1=1
+		
+		<isNotEmpty property="mvNameKor">
+			and MV_NAME_KOR like '%' ||  #mvNameKor# || '%'
+		</isNotEmpty>
+		<isNotEmpty property="mvNameEng">
+			and MV_NAME_ENG like '%' ||  #mvNameEng# || '%'
+		</isNotEmpty>
+		
+	</select>
+	
+	
+	
+	
+	
+
+</sqlMap>
+ 	

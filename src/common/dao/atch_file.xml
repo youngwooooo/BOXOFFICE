@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="atchFile"> 
+
+	<resultMap class="common.vo.AtchFileVO" id="atchFileMap">
+		<result property="atchFileCd"   	column="ATCH_FILE_CD"/>
+		<result property="fileSn"     		column="FILE_SN"/>
+		<result property="filePath"    column="FILE_PATH"/>
+		<result property="fileStoreName"     	column="FILE_STORE_NAME"/>
+		<result property="fileOrignName"     column="FILE_ORIGN_NAME"/>
+		<result property="fileExtsn"     	column="FILE_EXTSN"/>
+		<result property="fileContent"     		column="FILE_CONTENT"/>
+		<result property="fileSize"     	column="FILE_SIZE"/>
+	</resultMap>                                                      
+	
+	<!-- 파일 정보 조회 -->
+	<select id="getAtchFileList" parameterClass="common.vo.AtchFileVO" resultMap="atchFileMap">
+		SELECT * 
+		FROM tb_atch_file_detail
+		WHERE ATCH_FILE_CD = #atchFileCd#
+	</select>
+	
+	<!-- 파일 1개에 대한 정보 조회 -->
+	<select id="getAtchFileDetail" parameterClass="common.vo.AtchFileVO" resultMap="atchFileMap">
+		SELECT * 
+		FROM tb_atch_file_detail
+		WHERE ATCH_FILE_CD = #atchFileCd# AND file_sn = #fileSn#
+	</select>
+	
+	<!-- 파일 상세 정보 조회 -->
+	<select id="getAtchFileDetailList">
+		SELECT *
+		FROM TB_ATCH_FILE_DETAIL
+	</select>
+	
+	<insert id="insertAtchFile" parameterClass="common.vo.AtchFileVO">
+		<!-- 쿼리 값이 keyProperty에 담긴다. -->
+		<selectKey keyProperty="atchFileCd" resultClass="long">
+			SELECT atch_file_seq.nextval
+			FROM dual
+		</selectKey>
+		
+		INSERT INTO tb_atch_file(ATCH_FILE_CD, FILE_DATE, DELETE_YN)
+		VALUES(#atchFileCd#, sysdate, 'Y')
+		
+	</insert>
+	
+	<insert id="insertAtchFileDetail">
+		INSERT INTO tb_atch_file_detail(ATCH_FILE_CD, 
+									 file_sn, 
+									 FILE_PATH, 
+									 FILE_STORE_NAME, 
+									 FILE_ORIGN_NAME, 
+									 FILE_EXTSN, 
+									 FILE_CONTENT, 
+									 FILE_SIZE)
+		VALUES(#atchFileCd#,
+				(SELECT nvl(max(file_sn), 0) + 1
+				 FROM tb_atch_file_detail
+				 WHERE ATCH_FILE_CD = #atchFileCd#), 
+			   #filePath#, 
+			   #fileStoreName#, 
+			   #fileOrignName#, 
+			   #fileExtsn#, 
+			   #fileContent#, 
+			   #fileSize#)
+	</insert>
+	
+</sqlMap>			
+
+
+
+
+

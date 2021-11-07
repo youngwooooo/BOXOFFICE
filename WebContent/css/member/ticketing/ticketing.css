@@ -1,0 +1,82 @@
+@charset "UTF-8";
+.ticketing-container {width: 100%; margin-top: 60px;}
+.ticketing {margin-left: 50px; margin-right: 50px; border-bottom: 2px solid #d2d2d2;}
+.ticketing h1 {font-size: 35px;}
+
+hr {border: 1px solid #ff1212;}
+
+.ticketing-movie {margin: 20px 50px 0px 100px;}
+.ticketing-movie h2 {font-size: 20px; color: black;}
+.ticketing-movie span {color: #ff1212;}
+.choice-movie {margin-left: 50px; margin-top: 30px;}
+.choice-movie {float: left; margin-left: 25%;}
+.choice-movie li select {margin-top: 5px; width: 800px; height: 40px;}
+.choice-movie .choiceMenu {margin-bottom: 40px;}
+
+
+
+.ticketing-seat h2 {font-size: 20px; color: black;}
+.ticketing-seat span {color: #ff1212;}
+.ticketing-seat {clear: both; margin: 0px 50px 0px 100px; padding-top: 60px;}
+.ticketing-seat table {border: 1px solid; border-collapse: collapse;}
+.ticketing-seat th {border: 1px solid;}
+.ticketing-seat .member-separate {margin: 30px 0px 10px 30%;}
+.ticketing-seat .member-separate .kid, .teen, .adult, .Disabled {display: inline-flex;}
+.ticketing-seat .member-separate .kid h2, .teen h2, .adult h2, .Disabled h2 {margin-right: 10px; margin-left: 30px;}
+.ticketing-seat .member-separate .kid button, .teen button, .adult button, .Disabled button {width: 30px; font-size: 20px;}
+.ticketing-seat .member-separate .member-count {width: 30px; font-size: 20px; text-align: center;}
+.ticketing-seat .table-left {float: left; margin: 112px 0px 30px 5%;}
+.ticketing-seat .table-left th {height: 50px; width: 80px; font-size: 15px; background-color: black; color: white;}
+.ticketing-seat .table-center .screen {width: 1315px; height: 50px; background-color: black; color: white; font-size: 15px;}
+.ticketing-seat .table-center {float: left; margin: 20px 0px 20px 40px;}
+.ticketing-seat .table-center .table-num th {width: 100px; height: 40px; font-size: 15px; background-color: black; color: white;}
+.ticketing-seat .table-center .seat {margin-top: 25px; margin-bottom: 40px;}
+.ticketing-seat .table-center .seat td {width: 120px; height: 50px; font-size: 15px; text-align: center;}
+.ticketing-seat .table-right {float: left; margin: 250px 0px 0px 40px;}
+.ticketing-seat .table-right th {height: 50px; width: 80px; font-size: 15px;}
+.ticketing-seat .table-right .st1 {background-color: #f9f992; border-color: #f9f992;}
+.ticketing-seat .table-right .st2 {background-color: #f79999; border-color: #f79999;}
+.ticketing-seat .table-right .st3 {background-color: skyblue; border-color: skyblue;}
+
+.ticketing-snack {margin: 20px 50px 0px 100px; clear: both;}
+.ticketing-snack h2 , .choice-seat h2 {font-size: 20px; color: black;}
+.ticketing-snack span, .choice-seat span {color: #ff1212;}
+.ticketing-snack .choice-snack {margin-left: 50px; margin-top: 30px;}
+.ticketing-snack .choice-snack {float: left; margin-left: 25%;}
+.ticketing-snack .choice-snack li select {margin-top: 5px; width: 800px; height: 40px;}
+.ticketing-snack .choice-snack li input {margin-top: 5px; width: 300px; height: 30px; border: 1px solid black;}
+.ticketing-snack .choice-snack .choiceMenu {margin-bottom: 40px;}
+.ticketing-snack .choice-snack-info .snack-menu figure {display: inline;}
+.ticketing-snack .choice-snack-info .snack-menu img {width: 130px;}
+.ticketing-snack .choice-snack-info .snack-menu .snack {display: inline-block; padding: 30px;}
+.ticketing-snack .choice-snack-info .snack-menu .drink {display: inline-block; padding: 30px;}
+
+.ticketing-payment {margin: 20px 50px 20px 100px; clear: both;}
+.ticketing-payment h2 {font-size: 20px; color: black;}
+.ticketing-payment span {color: #ff1212;}
+.payment-price {margin-left: 35%; margin-top: 30px;}
+.payment-price h2 {font-size: 40px; color: black;}
+.payment-price span {color: #ff1212;}
+.payment-process {margin-bottom: 150px;}	
+.payment-price, .payment-btn {float: left;}
+.payment-btn button {
+							background-color: black; 
+							color: white; 
+							border: 1px solid black; 
+							border-radius: 40px; 
+							width: 150px;
+							height: 60px;
+							font-size: 25px;
+							margin-top: 30px;
+							margin-left: 100px;
+							cursor: pointer;
+						}
+					
+
+
+
+
+
+
+
+

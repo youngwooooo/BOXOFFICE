@@ -1,0 +1,4663 @@
+<html lang="ko"><head>
+<meta charset="utf-8">
+<title>KOFIC 영화관 입장권 통합전산망 :: 상영내역</title>
+<!-- 공통 js/css -->
+
+
+<!--[if IE]>
+<script src="/kobis/web/comm/commjs/html5shiv.js"></script>
+<![endif]-->
+
+
+
+<!-- 기본 css -->
+<link rel="stylesheet" type="text/css" href="/kobis/web/comm/commcss/default.css">
+<link rel="stylesheet" type="text/css" href="/kobis/web/comm/commcss/jquery-ui-1.12.1.min.css">
+<link rel="stylesheet" type="text/css" href="/kobis/web/comm/commcss/common.css">
+
+<script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script src="https://cr.acecounter.com/Web/AceCounter_AW.js?gc=AB2A31560820885&amp;py=0&amp;gd=gtt6&amp;gp=8080&amp;up=NaPm_Ncisy&amp;rd=1624325307174"></script><script type="text/javascript" src="/kobis/web/comm/commjs/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/jquery.dotdotdot.min.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/jquery.bxslider.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/comm_script.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/jquery-ui-1.12.1.min.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/jquery.ui.datepicker-ko.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/kobis.js"></script>
+
+<script type="text/javascript">
+jQuery.curCSS = function(element, prop, val) {
+    return jQuery(element).css(prop, val);
+};
+</script>
+<link rel="stylesheet" type="text/css" href="/kobis/web/comm/commcss/cont.css">
+<link rel="stylesheet" type="text/css" href="/kobis/web/comm/commcss/kobis.css">
+<script type="text/javascript" src="/kobis/web/comm/commjs/jcarousellite_1.0.1.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/IGuide.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/jquery.cookie.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/dialogStyle.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/layerpopup.js"></script> 
+<script type="text/javascript" src="/kobis/web/comm/commjs/innershiv.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/commjs/detailLayer.js"></script>
+<script type="text/javascript" src="/kobis/web/comm/online/js/Chart.js"></script><style type="text/css">/* Chart.js */
+@-webkit-keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}@keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}.chartjs-render-monitor{-webkit-animation:chartjs-render-animation 0.001s;animation:chartjs-render-animation 0.001s;}</style>
+<script type="text/javascript" src="/kobis/web/comm/online/js/jquery.peity.js"></script>  
+
+<style type="text/css">
+.title a {display: inline; float: none;}
+</style>
+<!-- 공통 js/css -->
+<script type="text/javascript">
+$(function() {
+	$( ".tf_cal" ).datepicker();
+	
+	if($('input[name="choice"]:radio:checked').length == 0) {
+		$('input[name="choice"]:radio:input[value="2"]').attr('checked', 'checked');
+	}
+	
+	$('input[name="choice"]').click(function(){
+		if($(this).val()==1){
+			$("#theaCd").val("");
+			$("#sTheaNm").val("");
+		}else{
+			$(".op1").find("select").prop("selectedIndex",0);
+			$("#sWideareaCd").next().find(".slt_coverInner").text("광역 선택")
+			$("#sBasareaCd").next().find(".slt_coverInner").text("기초 선택")
+			$("#sTheaCd").next().find(".slt_coverInner").text("영화상영관 선택")
+		}
+	});
+	
+	setSearchValue();
+	
+	//$(".tbl3 td:first-child").css('border-left','1px solid #d9d9d9');
+	$(".tbl3 td:first-child").each(function(){
+		console.log($(this).attr("rowspan"))
+		if(!$(this).attr("rowspan")){
+			$(this).css('border-left','1px solid #d9d9d9');
+		}
+	})
+	$("#sTheaNm").click(function fn_openLayedPop(){
+		var opts = {
+          'center' : false ,//가운데 정렬 아님
+          'modal'  : true ,
+          'searchname'  : '#sTheaNm', //조회 조건, 이 컴포넌트 아래 위치
+  		  'frmTy'  : 'table:tb_theater', //영화정보 <--테이블 형태로만 조회됨
+  		  'column' : 'thea_nm',
+	  		'height': '500',
+	  		'width': '520',
+	  		"pageSize":"5",
+  		  onComplete: function(data){
+  			$("#sTheaNm").val(data.theaNm);
+  			$("#theaCd").val(data.theaCd);
+          }
+      	};
+		$("#sTheaNm").layerPopup(opts);
+		$('input#op2').click();
+	});
+
+	
+	$("#btn_search").click(function() {
+		fn_searchList();
+	});
+	
+	$("#op2Txt").click(function() {
+		$("#op2").prop("checked","checked");
+	});
+	
+	$("#sWideareaCd").change(function(){ 
+		$("#op1").click();
+		makeBasareaCd($(this).val(), $("select[name='sBasareaCd']").get(0), '');
+		$("#sBasareaCd").val("");
+		$("#sTheaCd").val("");
+		$("#sBasareaCd").next().find(".slt_coverInner").text("기초 선택");
+		$("#sTheaCd").next().find(".slt_coverInner").text("영화상영관 선택");
+		$('input[name="choice"]:radio:input[value="1"]').attr('checked', 'checked');
+	});
+	
+	$("#sBasareaCd").change(function(){
+		$("#op1").prop("checked","checked");
+		makeTheaCd($("#sWideareaCd").val(), $(this).val(), $("select[name='sTheaCd']").get(0), '');
+		$("#sTheaCd").val("");
+		$("#sTheaCd").next().find(".slt_coverInner").text("영화상영관 선택");
+		$('input[name="choice"]:radio:input[value="1"]').attr('checked', 'checked');
+	});
+	
+	$("#sTheaCd").change(function(){
+		$("#op1").prop("checked","checked");
+	});
+	
+	if("2021-06-14" == "" && "2021-06-21" == "") {
+		today = new Date();
+
+		$("#showStartDt").val(getDateString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)));
+		$("#showEndDt").val(getDateString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)));
+
+		$("#theaArea").val("Y");
+	};
+
+	function makeBasareaCd(wideareaCd, selectObj, selectedBasareaCd) {
+		$.post("/kobis/business/mast/thea/findBasareaCdList.do?CSRFToken=HB9TIBzSgs2SwCpDd8ghRUKoW5Y-bS107QyOTcYVjFE", { sWideareaCd: wideareaCd}
+			,function(data){
+				var basareaCdList = data.basareaCdList;
+				$(selectObj).find("option:not(:first-child)").remove();
+				for(var i = 0; i < basareaCdList.length; i++){
+					if(selectObj){
+						if(selectedBasareaCd != basareaCdList[i].cd){
+							$(selectObj).append($("<option value=\""+ basareaCdList[i].cd +"\">" + basareaCdList[i].cdNm+"</option>"));
+						}else{
+							$(selectObj).append($("<option value=\""+ basareaCdList[i].cd +"\" selected=\"selected\">" + basareaCdList[i].cdNm+"</option>"));
+						}
+
+					}
+				}
+			}
+			,'json'
+		);
+	}
+
+	function makeTheaCd(wideareaCd, basareaCd, selectObj, selectedTheaCd) {
+		$.post("/kobis/business/mast/thea/findTheaCdList.do?CSRFToken=HB9TIBzSgs2SwCpDd8ghRUKoW5Y-bS107QyOTcYVjFE", { sWideareaCd: wideareaCd, sBasareaCd: basareaCd, mode: 'history'}
+			,function(data){
+				var theaCdList = data.theaCdList;
+				$(selectObj).find("option:not(:first-child)").remove();
+				for(var i = 0; i < theaCdList.length; i++){
+					if(selectObj){
+						if(selectedTheaCd != theaCdList[i].cd){
+							$(selectObj).append($("<option value=\""+ theaCdList[i].cd +"\">" + theaCdList[i].cdNm+"</option>"));
+						}else{
+							$(selectObj).append($("<option value=\""+ theaCdList[i].cd +"\" selected=\"selected\">" + theaCdList[i].cdNm+"</option>"));
+						}
+	
+					}
+				}
+			}
+			,'json'
+		);
+	}
+	function setSearchValue() {
+		$('#theaCd').val("");
+		$('#sTheaNm').val("");
+		$('#showStartDt').val("2021-06-14");
+		$('#showEndDt').val("2021-06-21");
+		$('#sWideareaCd').val("0105013");
+		$('#sBasareaCd').val("010601305");
+		$('#sTheaCd').val("013012");
+		$('#theaArea').val("Y");
+	}
+
+});
+	function chkForm() {
+		if(!chkDate($("#showStartDt").val())) {
+			alert("날짜 형식이 잘못되었습니다.");
+			return false;
+		}
+		/*if(!chkDate($("#showEndDt").val())) {
+			alert("날짜 형식이 잘못되었습니다.");
+			return false;
+		}*/
+		if(!isValidDate($("#showStartDt").val(), $("#showEndDt").val())) {
+			alert("기간이 잘못 입력되었습니다.");
+			return false;
+		}
+
+		fromDate = new Date($("#showStartDt").val().substring(0,4), (Number($("#showStartDt").val().substring(5,7)) - 1) + "", $("#showStartDt").val().substring(8,10));
+		toDate = new Date($("#showEndDt").val().substring(0,4), (Number($("#showEndDt").val().substring(5,7)) - 1) + "", $("#showEndDt").val().substring(8,10));
+		if(!fn_getDatePeriod(fromDate, toDate)) {
+			alert("조회할 수 있는 최대기간은 한달입니다.");
+			return false;
+		}	
+		
+		if($('input[name="choice"]:checked').val() == "2") {
+			if($("#sTheaNm").val() == "") {
+				alert("영화상영관명을 입력하세요.");
+				return false;
+			}
+		};
+		if($('input[name="choice"]:checked').val() == "1") {
+			if($("#sWideareaCd").val() == "") {
+				alert("광역단체를 선택하세요.");
+				return false;
+			}
+			if($("#sBasareaCd").val() == "") {
+				alert("기초단체를 선택하세요.");
+				return false;
+			}
+			if($("#sTheaCd").val() == "") {
+				alert("영화상영관을 선택하세요.");
+				return false;
+			}
+		};
+		if($('input[name="choice"]:checked').val() == "1") {
+			//$("#theaCd").val($("#sTheaCd").val());
+		}
+		return true;
+	}
+	// 기간이 한달 이상인지 여부를 체크
+	function fn_getDatePeriod(fromDate, toDate) {
+		previousDate = add_months(toDate,-1);
+		if(fromDate <= previousDate)
+		//if((toDate.getTime() - fromDate.getTime())/1000/60/60/24/30 > 1)
+			return false;
+		else
+			return true;
+	}
+
+	function add_months(iDate, addInt){
+		if (iDate instanceof Date){
+			var lastDayF = new Date(new Date(iDate.getFullYear(), iDate.getMonth()+1, 1, iDate.getHours(), iDate.getMinutes(), iDate.getSeconds(),iDate.getMilliseconds() )-(1000*60*60));			// 입력월의 마지막 날짜
+			var lastDayT = new Date(new Date(iDate.getFullYear(), iDate.getMonth()+1+addInt, 1, iDate.getHours(), iDate.getMinutes(), iDate.getSeconds(),iDate.getMilliseconds() )-(1000*60*60));	// 해당월의 마지막 날짜
+			if(iDate.getDate()==lastDayF.getDate()){				// 입력날짜가 말일이면 해당월의 말일을 반환
+				return lastDayT;
+			}else{
+				var toDate = new Date(iDate.getFullYear(), iDate.getMonth()+addInt, iDate.getDate(), iDate.getHours(), iDate.getMinutes(), iDate.getSeconds(),iDate.getMilliseconds());
+				if(toDate > lastDayT){							// 해당월의 날짜가 말일보다 크면 말일을 반환
+					return lastDayT;
+				}else{
+					return toDate;
+				}
+			}
+		}else{
+			return null;
+		}
+	}
+	
+	function fn_searchList() {
+		if(chkForm()) {
+		fn_showProgressBar();
+			$("#searchForm").attr("action", "findShowHistorySc.do").submit();
+		}
+	}
+
+	function fn_excel() {
+		if(chkForm()) {
+			$("#searchForm").attr("action", "findShowHistoryScXls.do").submit();
+		}
+	}
+	function theaChange(t){
+		console.log($(t).attr("class"));
+		if($(t).attr("class")=="btn_add"){
+			$(t).attr("class", "btn_minus");
+			$(".rst1 table").hide();
+		}else{
+			$(t).attr("class", "btn_add");
+			$(".rst1 table").show();
+		}
+	}
+</script> 
+</head>
+
+<body>
+<!-- 로딩중 -->
+<!-- <div id="wrap_layer">
+	<div class="bg"></div>
+	<p style="position:absolute;top:40%;left:40%;z-index: 10000;"><img src="/kobis/web/comm/images/comm/progressbar.gif" alt="현재 페이지를 로딩중입니다."></p>
+</div> -->
+<!-- 로딩중 -->
+<div id="wrap" class="mvie5_3">
+	
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+	function mainTopMenuTopView(divName) {
+		var frm = document.getElementById(divName);
+		if(frm.style.display != "block") frm.style.display = "block";
+		else frm.style.display = "none";
+	}
+	
+	function fn_changeSearch() {
+		SetCookie("sel_s_type", $("#sel_s_type").val());
+		var pForm = document.searchMainTopMovie;
+		
+		if($("#sel_s_type").val() == "M") {
+			pForm.action="/kobis/business/mast/mvie/searchMovieList.do";
+			$("#inp_solrSearch").attr("name", "sMovName");
+		} else {
+			pForm.action="/kobis/business/comm/search/search.do";
+			$("#inp_solrSearch").attr("name", "queryString");
+		}
+	}
+	
+	function fn_mainTopMovieSearch(){
+		var pForm = document.searchMainTopMovie;
+		pForm.submit();
+	}
+	
+	$(document).ready(function() { 
+	    if(GetCookie("sel_s_type") == "T") {
+	    	$("#sel_s_type").val("T");
+	    	
+	    	var pForm = document.searchMainTopMovie;
+	    	pForm.action="/kobis/business/comm/search/search.do";
+	    	
+	    	$("#inp_solrSearch").attr("name", "queryString"); 
+	    }
+	    $("ul.list_nav > li > a").click(function(){
+	    
+	    		
+	    	if($(this).parent().find(".bg_sub ul.nav_sub > li:eq(0)  li.depth3:eq(0)").length >0){
+	    		$(this).parent().find(".bg_sub ul.nav_sub > li:eq(0)  li.depth3:eq(0) a").click();
+	    		goDirectPage($(this).parent().find(".bg_sub ul.nav_sub > li:eq(0)  li.depth3:eq(0) a").attr("href"));
+	    	}else{
+	    		$(this).parent().find(".bg_sub ul.nav_sub > li:eq(0) a").click();
+	    		goDirectPage($(this).parent().find(".bg_sub ul.nav_sub > li:eq(0) a").attr("href"));
+	    	}
+	    	
+	    	
+	    	if($(this).parent().hasClass("nav5")){
+	    		/* $(this).attr("href","/kobis/business/stat/online/onlinefindDailyBoxOfficeList.do"); */
+	    		location.href="/kobis/business/stat/online/onlineMain.do";
+	    	}
+	    });
+	}); 
+	function goDirectPage(page){
+		location.href=page;
+	}
+</script>
+
+<!-- 운영 적용시 if문 삭제 -->
+
+
+<div id="header" class="minwidth">
+    	<div class="hd_top">
+            <h1><a href="/kobis/business/main/main.do" class="block"><img src="/kobis/web/comm/images/comm/logo_comm.png" alt="KOBIS 영화관 입장권 통합 전산망"></a></h1>
+            <div class="hd_sch">
+            	<form action="/kobis/business/mast/mvie/searchMovieList.do" id="searchMainTopMovie" name="searchMainTopMovie" method="post">
+            	<input type="hidden" name="CSRFToken" value="HB9TIBzSgs2SwCpDd8ghRUKoW5Y-bS107QyOTcYVjFE" autocomplete="off">            	
+                <fieldset>
+                    <legend class="blind">검색</legend>
+                    <div class="hd_slt">
+                        <select class="slt" id="sel_s_type" onchange="fn_changeSearch();" style="position: absolute; opacity: 0; font-size: 14px;">
+                            <option value="M">영화정보</option>
+                            <option value="T">통합검색</option>
+                        </select><span class="slt_cover"><span class="slt_coverInner">영화정보</span></span>
+                    </div>
+                    <span class="hd_tf">                        
+                        <input type="text" class="tf" id="inp_solrSearch" name="sMovName" placeholder="검색어를 입력하세요." value="" autocomplete="off">
+                        <input type="hidden" name="sMovLang" value="ko" autocomplete="off">
+                    </span>
+                    <button type="button" class="btn_sch" onclick="fn_mainTopMovieSearch();return false;"><span class="ico_comm hidetxt">검색</span></button>                 
+                </fieldset>
+                </form>
+            </div>
+            <span style="bottom: 20px; float: right; display: block; position: relative;">
+               	<a href="/kobis/business/comm/bord/listMyTip.do?bizLogicType=3"><img style="margin-right: 4px;" alt="" src="/kobis/web/comm/images/main/head_ico1.png"></a>
+               	<!-- <a href="/kobis/business/mast/peop/searchPeopleList.do"><img alt="" src="/kobis/web/comm/images/main/head_ico2.png"></a> -->
+            </span>
+            <div class="gnb_top">
+                <ul class="fl">
+                	
+	                		<li><a href="/kobis/business/comm/user/openRegiUser.do">회원가입</a></li>
+							<li><a href="/kobis/business/comm/user/openLogin.do">로그인</a></li>
+	                	
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 사이트 메뉴 -->		
+		<div id="nav" class="minwidth">
+			<h2 class="blind">사이트 메뉴</h2>
+			<ul class="list_nav minwidth" style="min-width: 1260px">
+			 	
+			 	
+			 		<li class="depth1 nav1 headerWidth">
+			 			<a href="javascript:;" class="tit_nav">
+			 				영화정보검색
+			 			</a>
+			 			
+			 			<div class="wrap_sub">
+			 				<div class="bg_sub">
+			 					
+					 						<div class="visu_nav visu_mvie">
+				                                <strong class="depth2">영화</strong>
+				                                <span class="depth3">영화정보</span>
+				                            </div>
+					 					
+			 				
+			 				
+			 					<ul class="nav_sub">
+			 						
+			 						
+			 								<li class="depth2">
+			 									<a href="/kobis/business/mast/mvie/searchMovieList.do" class="tit_sub">영화</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/mvie/searchMovieList.do" class="block">영화정보</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/mvie/findOpenScheduleList.do" class="block">개봉스케줄</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/mvie/searchPrdtList.do" class="block">한국영화 제작상황판</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/mvie/findDiverMovList.do" class="block">독립·예술영화</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/mast/peop/searchPeopleList.do" class="tit_sub">영화인</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/mast/comp/searchCompanyList.do" class="tit_sub">영화사</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/mast/thea/findTheaterInfoList.do" class="tit_sub">영화상영관</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findTheaterInfoList.do" class="block">영화상영관정보</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findAreaTheaterStat.do" class="block">지역별 영화상영관현황</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findShowHistorySc.do" class="block">상영내역</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findTheaterSchedule.do" class="block">상영스케줄</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findScreenQuota.do" class="block">스크린쿼터내역</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findArtScreenStat.do" class="block">전용상영관 현황</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findArtShowHistory.do" class="block">전용상영관 상영내역</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/mast/fest/searchUserFestInfoList.do" class="tit_sub">영화제</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/mast/mvie/searchUserMovCdList.do" class="tit_sub">코드검색 및 등록</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/mvie/searchUserMovCdList.do" class="block">영화코드</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/send/findSenderCodeList.do" class="block">전송사업자코드</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/mast/thea/findTheaterCodeList.do" class="block">영화상영관코드</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 					</ul>
+			 				</div>
+			 			</div>
+			 		</li>
+			 	
+			 		<li class="depth1 nav2 headerWidth">
+			 			<a href="javascript:;" class="tit_nav">
+			 				박스오피스
+			 			</a>
+			 			
+			 			<div class="wrap_sub">
+			 				<div class="bg_sub">
+			 					
+					 						<div class="visu_nav visu_boxs">
+				                                <strong class="depth2">박스오피스</strong>
+				                                <span class="depth3">일별</span>
+				                            </div>
+					 					
+			 				
+			 				
+			 					<ul class="nav_sub">
+			 						
+			 						
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findDailyBoxOfficeList.do" class="tit_sub">박스오피스</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findDailyBoxOfficeList.do" class="block">일별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findWeeklyBoxOfficeList.do" class="block">주간/주말</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findMonthlyBoxOfficeList.do" class="block">월별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findYearlyBoxOfficeList.do" class="block">연도별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findFormerBoxOfficeList.do" class="block">역대</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findPeriodBoxOfficeList.do" class="block">기간별</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findWeekendForeignBoxOfficeList.do" class="tit_sub">해외 박스오피스</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findWeekendForeignBoxOfficeList.do" class="block">주말</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findRealTicketList.do" class="tit_sub">예매율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findRealTicketList.do" class="block">실시간</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findDailySeatTicketList.do" class="tit_sub">좌석점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findDailySeatTicketList.do" class="block">일별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findWeeklySeatTicketList.do" class="block">주간/주말</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findPeriodSeatTicketList.do" class="block">기간별</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findDailyShowTicketList.do" class="tit_sub">상영점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findDailyShowTicketList.do" class="block">일별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findWeeklyShowTicketList.do" class="block">주간/주말</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findPeriodShowTicketList.do" class="block">기간별</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findDailyScreenTicketList.do" class="tit_sub">스크린점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findDailyScreenTicketList.do" class="block">일별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findWeeklyScreenTicketList.do" class="block">주간/주말</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findPeriodScreenTicketList.do" class="block">기간별</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/unfair/findDailyShowFrequency.do" class="tit_sub">공정신호등</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/unfair/findDailyShowFrequency.do" class="block">공정신호등(상영회차별 점유상황)</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/boxs/findDailyMultichainList.do" class="tit_sub">체인영화관별 상영현황</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/boxs/findDailyMultichainList.do" class="block">멀티체인별 상영현황</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 					</ul>
+			 				</div>
+			 			</div>
+			 		</li>
+			 	
+			 		<li class="depth1 nav3 headerWidth">
+			 			<a href="javascript:;" class="tit_nav">
+			 				테마통계
+			 			</a>
+			 			
+			 			<div class="wrap_sub">
+			 				<div class="bg_sub">
+			 					
+					 						<div class="visu_nav visu_them">
+				                              <strong class="depth2">총 관객수 및 매출액</strong>
+				                              <span class="depth3">연도별</span>
+				                            </div>
+					 					
+			 				
+			 				
+			 					<ul class="nav_sub">
+			 						
+			 						
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/them/findYearlyTotalList.do" class="tit_sub">총 관객수 및 매출액</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/them/findYearlyTotalList.do" class="block">연도별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/them/findMonthlyTotalList.do" class="block">월별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/them/findWeeklyTotalList.do" class="block">요일별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/them/findDailyTotalList.do" class="block">일별</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/them/findNationalityShareList.do" class="tit_sub">국적별 점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/them/findAreaShareList.do" class="tit_sub">지역별 점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/them/findShowTypeShareList.do" class="tit_sub">상영타입별 점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/them/findRatingShareList.do" class="tit_sub">등급별 점유율</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 					</ul>
+			 				</div>
+			 			</div>
+			 		</li>
+			 	
+			 		<li class="depth1 nav4 headerWidth">
+			 			<a href="javascript:;" class="tit_nav">
+			 				공식통계
+			 			</a>
+			 			
+			 			<div class="wrap_sub">
+			 				<div class="bg_sub">
+			 					
+					 						<div class="visu_nav visu_offc">
+				                              <strong class="depth2">개봉일람</strong>
+				                              <span class="depth3">연도별</span>
+				                            </div>
+					 					
+			 				
+			 				
+			 					<ul class="nav_sub">
+			 						
+			 						
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/offc/searchOfficHitTotList.do?searchMode=year" class="tit_sub">개봉일람</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/offc/searchOfficHitTotList.do?searchMode=year" class="block">연도별</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/offc/searchOfficHitTotList.do?searchMode=month" class="block">월별</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/offc/findYearlyBoxOfficeList.do" class="tit_sub">연도별 박스오피스</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/offc/findFormerBoxOfficeList.do" class="tit_sub">역대 박스오피스</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 					</ul>
+			 				</div>
+			 			</div>
+			 		</li>
+			 	
+			 		<li class="depth1 nav5 headerWidth">
+			 			<a href="javascript:;" class="tit_nav">
+			 				온라인상영관 박스오피스
+			 			</a>
+			 			
+			 			<div class="wrap_sub">
+			 				<div class="bg_sub">
+			 					
+					 						<div class="visu_nav visu_online">
+				                              <strong class="depth2">온라인상영관 박스오피스</strong>
+				                              <span class="depth3">일간 이용순위</span>
+				                            </div>
+					 					
+			 				
+			 				
+			 					<ul class="nav_sub">
+			 						
+			 						
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/online/onlineDailyBoxRank.do" class="tit_sub">온라인상영관 박스오피스</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineDailyBoxRank.do" class="block">일간 이용순위</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineWeeklyBoxRank.do" class="block">주간 이용순위</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineMonthlyBoxRank.do" class="block">월간 이용순위</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineYearlyBoxRank.do" class="block">연간 이용순위</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineFormerBoxRank.do" class="block">역대 이용순위</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/online/onlineMovieList.do" class="tit_sub">온라인상영작 정보</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineMovieList.do" class="block">전체작품 정보</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineNewMovieList.do" class="block">최신상영작 정보</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineCompNewMovieList.do" class="block">상영관별 최신작 정보</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/online/onlineDailyStat.do" class="tit_sub">산업 통계</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineDailyStat.do" class="block">산업 일간 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineWeeklyStat.do" class="block">산업 주간 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineMonthlyStat.do" class="block">산업 월간 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineYearlyStat.do" class="block">산업 연간 통계</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/online/onlineNationStat.do" class="tit_sub">테마 통계</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineNationStat.do" class="block">국적분포/점유율 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineGenreStat.do" class="block">장르분포/점유율 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineArtMovieStat.do" class="block">독립·예술영화 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineMonthlySumStat.do" class="block">월별 점유율 통계</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/stat/online/onlineSeasonSumStat.do" class="block">계절별 점유율 통계</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/online/onlineCompList.do" class="tit_sub">온라인상영관</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/stat/online/onlineintro.do" class="tit_sub">온라인상영관통합전산망 소개</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 					</ul>
+			 				</div>
+			 			</div>
+			 		</li>
+			 	
+			 		<li class="depth1 nav6 headerWidth">
+			 			<a href="javascript:;" class="tit_nav">
+			 				고객센터
+			 			</a>
+			 			
+			 			<div class="wrap_sub">
+			 				<div class="bg_sub">
+			 					
+					 						<div class="visu_nav visu_cs">
+				                              <strong class="depth2">공지사항</strong>
+				                              <span class="depth3"></span>
+				                            </div>
+					 					
+			 				
+			 				
+			 					<ul class="nav_sub">
+			 						
+			 						
+			 								<li class="depth2">
+			 									<a href="/kobis/business/comm/ntfy/findCustomerNotifyList.do" class="tit_sub">공지사항</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/comm/comm/openKobisIntro.do" class="tit_sub">KOBIS소개</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openKobisIntro.do" class="block">KOBIS소개</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openCinemAconnect.do" class="block">영화상영관연동안내</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openMemBerJoin.do" class="block">회원가입안내</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openOffTheater.do" class="block">비상설 상영장 가입안내</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openStatute.do" class="block">영비법</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openSiteMap.do" class="block">SITE MAP</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openPrivacyAgreement.do" class="block">개인정보처리방침</a>
+			 												</li>
+			 											
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/comm/openLocation.do" class="block">오시는 길</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/comm/bord/listMyTip.do?bizLogicType=3" class="tit_sub">정보수정요청</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 												<li class="depth3">
+			 													<a href="/kobis/business/comm/bord/insertTip.do" class="block">정보수정요청 등록</a>
+			 												</li>
+			 											
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/comm/user/openLogin.do" class="tit_sub">로그인</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/comm/user/openRegiUser.do" class="tit_sub">회원가입</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/comm/comm/openFaq.do" class="tit_sub">FAQ</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 								<li class="depth2">
+			 									<a href="/kobis/business/sati/findSatiReqList.do" class="tit_sub">설문조사</a>			 									
+			 									
+			 									<ul class="ovf overdepth">
+			 										
+			 									</ul>
+			 								</li>
+			 							
+			 					</ul>
+			 				</div>
+			 			</div>
+			 		</li>
+			 	
+			</ul>
+		</div>
+ </div>
+ 
+    <!-- container -->
+    <div id="container">
+    
+<div id="snb">
+		
+	 	 	<h2 class="blind">
+            	영화정보검색
+            </h2>
+            <h3>
+            	영화정보검색
+            </h3>
+ 			<ul class="list_snb">
+ 		
+ 				<!-- 메뉴 대시보드 제거 하드코딩 c:choose 삭제 -->
+ 				
+		 			<li no="101">
+		 				<strong class="tit"><a href="/kobis/business/mast/mvie/searchMovieList.do">영화</a></strong>
+		 				
+		                    <a href="javascript:;" class="hidetxt"><span class="ico_comm">펼쳐보기</span></a>
+		                    <ul class="list_submenu">
+			 						
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="241"> 
+			 										<a href="/kobis/business/mast/mvie/searchMovieList.do" class="block">영화정보</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="360"> 
+			 										<a href="/kobis/business/mast/mvie/findOpenScheduleList.do" class="block">개봉스케줄</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="243"> 
+			 										<a href="/kobis/business/mast/mvie/searchPrdtList.do" class="block">한국영화 제작상황판</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="363"> 
+			 										<a href="/kobis/business/mast/mvie/findDiverMovList.do" class="block">독립·예술영화</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 									
+			 				</ul>
+		 				
+		 			</li>
+		 			
+ 				<!-- 메뉴 대시보드 제거 하드코딩 c:choose 삭제 -->
+ 				
+		 			<li no="102">
+		 				<strong class="tit"><a href="/kobis/business/mast/peop/searchPeopleList.do">영화인</a></strong>
+		 				
+		 			</li>
+		 			
+ 				<!-- 메뉴 대시보드 제거 하드코딩 c:choose 삭제 -->
+ 				
+		 			<li no="255">
+		 				<strong class="tit"><a href="/kobis/business/mast/comp/searchCompanyList.do">영화사</a></strong>
+		 				
+		 			</li>
+		 			
+ 				<!-- 메뉴 대시보드 제거 하드코딩 c:choose 삭제 -->
+ 				
+		 			<li no="365" class="on">
+		 				<strong class="tit"><a href="/kobis/business/mast/thea/findTheaterInfoList.do">영화상영관</a></strong>
+		 				
+		                    <a href="javascript:;" class="hidetxt"><span class="ico_comm">펼쳐보기</span></a>
+		                    <ul class="list_submenu">
+			 						
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="547"> 
+			 										<a href="/kobis/business/mast/thea/findTheaterInfoList.do" class="block">영화상영관정보</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="570"> 
+			 										<a href="/kobis/business/mast/thea/findAreaTheaterStat.do" class="block">지역별 영화상영관현황</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="1260" class="on"> 
+			 										<a href="/kobis/business/mast/thea/findShowHistorySc.do" class="block">상영내역</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="368"> 
+			 										<a href="/kobis/business/mast/thea/findTheaterSchedule.do" class="block">상영스케줄</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="370"> 
+			 										<a href="/kobis/business/mast/thea/findScreenQuota.do" class="block">스크린쿼터내역</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="371"> 
+			 										<a href="/kobis/business/mast/thea/findArtScreenStat.do" class="block">전용상영관 현황</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="1331"> 
+			 										<a href="/kobis/business/mast/thea/findArtShowHistory.do" class="block">전용상영관 상영내역</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 									
+			 				</ul>
+		 				
+		 			</li>
+		 			
+ 				<!-- 메뉴 대시보드 제거 하드코딩 c:choose 삭제 -->
+ 				
+		 			<li no="103">
+		 				<strong class="tit"><a href="/kobis/business/mast/fest/searchUserFestInfoList.do">영화제</a></strong>
+		 				
+		 			</li>
+		 			
+ 				<!-- 메뉴 대시보드 제거 하드코딩 c:choose 삭제 -->
+ 				
+		 			<li no="170">
+		 				<strong class="tit"><a href="/kobis/business/mast/mvie/searchUserMovCdList.do">코드검색 및 등록</a></strong>
+		 				
+		                    <a href="javascript:;" class="hidetxt"><span class="ico_comm">펼쳐보기</span></a>
+		                    <ul class="list_submenu">
+			 						
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="171"> 
+			 										<a href="/kobis/business/mast/mvie/searchUserMovCdList.do" class="block">영화코드</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="373"> 
+			 										<a href="/kobis/business/mast/send/findSenderCodeList.do" class="block">전송사업자코드</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 										
+			 								<!-- 메뉴 하드코딩 c:choose 제거2 --> 
+			 								
+			 										<li no="375"> 
+			 										<a href="/kobis/business/mast/thea/findTheaterCodeList.do" class="block">영화상영관코드</a>
+			 										<ul>
+										 				
+										 				</ul>
+										 			</li>
+			 									
+			 				</ul>
+		 				
+		 			</li>
+		 				
+ 			</ul>
+ 			
+</div>	
+
+
+    	<div id="content"> 
+            <!-- 타이틀 & 현재 페이지 위치 -->
+           
+	<div class="hd">
+		<h4 class="tit" no="1260">
+				
+				<img src="/kobis/web/comm/images/mast/title_screenHistory.gif" alt="상영내역">
+		</h4>
+		<strong class="blind">상영내역</strong>
+	<ul class="locate">
+		<li><a href="/kobis/business/main/main.do"><span class="ico_comm">홈</span></a></li>
+	
+			<li><a href="/kobis/business/mast/mvie/searchMovieList.do">영화정보검색</a></li>
+		
+			<li><a href="/kobis/business/mast/thea/findTheaterInfoList.do">영화상영관</a></li>
+		
+			<li> <strong>상영내역</strong></li>
+		
+	</ul>
+	</div>
+	
+	
+            <!-- //타이틀 & 현재 페이지 위치 -->
+
+			<div class="box_gray">
+            	<p class="dot01"><span class="fwb">[상영내역]</span>코너는 각 영화상영관의 일자별 영화상영내역 정보를 발권데이터 기준으로 제공하고 있습니다.</p>
+                <p class="dot01">영화상영관에서 상영은 했지만 해당회차에 관객이 없어 발권데이터가 입수되지 않으면 기본적으로 해당회차의 상영내역은 제공되지 않습니다.</p>
+                <p class="dot01">발권데이터가 없는 해당회차의 상영정보는 <strong>스케쥴데이터</strong>를 이용하여 추가적으로 제공되는 정보이므로, 실제 상영정보와 차이가 있을 수 있습니다.<strong>(빨간색으로 표기)</strong></p>
+            </div>
+            
+            
+            <div class="f_sch">
+            	<div class="tar">
+                	<a href="javascript:;" class="btn_small" onclick="fn_excel();return false;">엑셀</a>
+                </div>
+                <form action="findShowHistory.do" id="searchForm" name="searchForm" method="post">
+                	<input type="hidden" name="CSRFToken" value="HB9TIBzSgs2SwCpDd8ghRUKoW5Y-bS107QyOTcYVjFE" autocomplete="off">
+	                <input type="hidden" id="theaCd" name="theaCd" value="" autocomplete="off">
+					<input type="hidden" id="theaArea" name="theaArea" value="Y" autocomplete="off">	
+                    <div class="ins">
+                        <div class="item" style="width:614px;">
+                            <strong class="dot01">상영기간</strong>
+                            <div class="period">
+                                <div class="fl">
+                                    <label for="showStartDt" class="btn_cal"><span class="ico_comm">달력</span> </label>
+                                    <div class="tf_comm"><input type="text" id="showStartDt" class="tf tf_cal hasDatepicker" name="showStartDt" autocomplete="off"></div>
+                                </div>
+                                ~
+                                <div class="fr">
+                                    <label for="showEndDt" class="btn_cal"><span class="ico_comm">달력</span> </label>
+                                    <div class="tf_comm"><input type="text" id="showEndDt" class="tf tf_cal hasDatepicker" name="showEndDt" autocomplete="off"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item slt_theater">
+                            <strong class="blind">상영관 선택</strong>
+                            <div class="op1">
+                            	<input type="radio" id="op1" title="영화상영관선택 옵션" class="chk_comm radio" name="choice" value="1" checked="" autocomplete="off">
+                                <label for="op1" class="hidetxt">지역별 상영관 검색</label>
+                                <div class="slt_comm slt1">
+                                	<select class="slt" title="광역 선택" id="sWideareaCd" name="sWideareaCd" style="position: absolute; opacity: 0; font-size: 13px;">
+                                		<option value="">광역선택</option>
+										
+											<option value="0105001">서울시</option>
+										
+											<option value="0105002">경기도</option>
+										
+											<option value="0105003">강원도</option>
+										
+											<option value="0105004">충청북도</option>
+										
+											<option value="0105005">충청남도</option>
+										
+											<option value="0105006">경상북도</option>
+										
+											<option value="0105007">경상남도</option>
+										
+											<option value="0105008">전라북도</option>
+										
+											<option value="0105009">전라남도</option>
+										
+											<option value="0105010">제주도</option>
+										
+											<option value="0105011">부산시</option>
+										
+											<option value="0105012">대구시</option>
+										
+											<option value="0105013">대전시</option>
+										
+											<option value="0105014">울산시</option>
+										
+											<option value="0105015">인천시</option>
+										
+											<option value="0105016">광주시</option>
+										
+											<option value="0105017">세종시</option>
+										
+                                    </select><span class="slt_cover"><span class="slt_coverInner">대전시</span></span>
+                                </div>
+                                <div class="slt_comm slt2">
+                                	<select class="slt" title="기초 선택" id="sBasareaCd" name="sBasareaCd" style="position: absolute; opacity: 0; font-size: 13px;">
+                                		<option value="">기초선택</option>
+										
+											<option value="010601301">대덕구</option>
+										
+											<option value="010601302">동구</option>
+										
+											<option value="010601303">서구</option>
+										
+											<option value="010601304">유성구</option>
+										
+											<option value="010601305">중구</option>
+										
+                                    </select><span class="slt_cover"><span class="slt_coverInner">중구</span></span>
+                                </div>
+                               <div class="slt_comm slt3">
+                                	<select class="slt" title="영화상영관 선택" id="sTheaCd" name="sTheaCd" style="position: absolute; opacity: 0; font-size: 13px;">
+                                	<option value="">영화상영관선택</option>
+										
+												<option value="013012">CGV 대전</option>
+										
+												<option value="013036">대전독립영화전용관 씨네인디U</option>
+										
+												<option value="013003">동백시네마(갤러리아)</option>
+										
+												<option value="013033">메가박스 대전중앙로</option>
+										
+                                    </select><span class="slt_cover"><span class="slt_coverInner">CGV 대전</span></span>
+                                </div> 
+                            </div>
+                            <div class="op2">
+                            	<input type="radio" id="op2" class="chk_comm radio" name="choice" value="2" autocomplete="off">
+                                <label for="op2">영화상영관명</label>
+                                <div class="tf_comm">
+                                	<input type="text" class="tf" readonly="readonly" id="sTheaNm" name="sTheaNm" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wrap_btn">
+                        	<button type="button" class="btn_blue" id="btn_search">조회</button>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+            
+            <div class="rst_sch">
+            	<div class="rst1">
+                	<strong class="tit_ba">영화상영관 정보<button type="button" class="btn_add" style="margin-left: 10px;vertical-align: top" onclick="theaChange(this);return false;"><span class="ico_comm">추가</span></button></strong>
+                    <table class="tbl3 info1">
+                    	<caption class="blind">영화상영관 정보 개요</caption>
+                        <colgroup>
+                        	<col width="13%"><col width="37%"><col width="13%"><col width="37%">
+                        </colgroup>
+                        <tbody><tr class="fst">
+                        	<th scope="row">영화상영관명</th>
+							<td>CGV 대전</td>
+							<th scope="row">전송사업자</th>
+							<td>CJ올리브네트웍스(주)</td>
+                        </tr>
+                        <tr>
+                        	<th scope="col">통합전산망 가입여부</th>
+                            <td>가입</td>
+                            <th scope="col">가입일자</th>
+                            
+							<td>2004-04-12</td>
+							
+                        </tr>
+                        <tr>
+                        	<th scope="col">전화번호</th>
+                            <td>1544-1122</td>
+                            <th scope="col">FAX 번호</th>
+                            <td>042-223-9906</td>
+                        </tr>
+                        <tr>
+                        	<th scope="col">주소</th>
+                            <td>대전광역시 중구 문화동 1-16 번지 세이백화점 별관 6층 </td>
+                            <th scope="col">홈페이지</th>
+                            <td>http://www.cgv.co.kr</td>
+                        </tr>
+                    </tbody></table>
+                    
+	                    <table class="tbl3 info2">
+	                    	<caption>상영관 정보</caption>
+						<colgroup>
+							<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+								<col style="width:4px;">
+							
+							<col style="width:5px;">
+						</colgroup>
+						<thead>
+						<tr>
+							<th scope="col">상영관</th>
+							
+								<th scope="col">
+									4DX
+								</th>
+							
+								<th scope="col">
+									02관
+								</th>
+							
+								<th scope="col">
+									03관
+								</th>
+							
+								<th scope="col">
+									04관(SCREENX)
+								</th>
+							
+								<th scope="col">
+									IMAX
+								</th>
+							
+								<th scope="col">
+									06관
+								</th>
+							
+								<th scope="col">
+									07관 [아트하우스]
+								</th>
+							
+								<th scope="col">
+									08관
+								</th>
+							
+								<th scope="col">
+									09관
+								</th>
+							
+							<th scope="col">총 9관</th>
+						</tr>
+						</thead>
+                        <tbody>
+                        	<tr>
+                            	<th scope="col">좌석수</th>
+                                
+									<td>108</td>
+								
+									<td>249</td>
+								
+									<td>344</td>
+								
+									<td>273</td>
+								
+									<td>364</td>
+								
+									<td>130</td>
+								
+									<td>130</td>
+								
+									<td>141</td>
+								
+									<td>141</td>
+								
+                                <td>총 1880개</td>
+                            </tr>
+                        </tbody>                       
+                    </table>
+                </div>
+                
+                <div class="rst2">
+                	<strong class="tit_ba">상영 내역</strong>
+                    <table class="tbl3 info3">
+                    	<caption class="blind">상영 내역</caption>
+						<thead>
+                        	<tr>
+                            	<th scope="col">상영일자</th>
+								<th scope="col">상영관</th>
+								
+									<th scope="col">1회</th>
+								
+									<th scope="col">2회</th>
+								
+									<th scope="col">3회</th>
+								
+									<th scope="col">4회</th>
+								
+									<th scope="col">5회</th>
+								
+									<th scope="col">6회</th>
+								
+									<th scope="col">7회</th>
+								
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-14</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							10:00 (9,000원)<br>
+							파이프라인(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							12:10<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							14:20 (13,000원)<br>
+							파이프라인(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							16:30<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							19:00 (10,500원)<br>
+							파이프라인(디지털)
+						</td>
+
+						<td class="left">
+							21:10 (13,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							09:20 (9,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							11:55 (11,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							14:30 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							17:05 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							19:40 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:20 (9,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							11:40 (0원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							14:00 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							16:20 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (8,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							21:00 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							<font color="red">
+							09:15<br>
+							아야와 마녀(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							11:00 (9,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							13:15 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							15:30 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							17:45 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							20:00 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:30 (12,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							12:50 (15,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							15:10 (16,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							17:30 (16,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							19:50 (16,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							10:35 (9,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							12:20 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							14:20 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							16:20 (13,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							18:10 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							20:50 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							<font color="red">
+							10:20<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							12:40 (11,000원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (13,000원)<br>
+							강호아녀(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							17:00<br>
+							까치발(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							18:40 (5,000원)<br>
+							애플(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (13,000원)<br>
+							강호아녀(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							<font color="red">
+							10:10<br>
+							봄날은 간다(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							12:30 (0원)<br>
+							실크 로드(디지털)
+						</td>
+
+						<td class="left">
+							14:50 (10,000원)<br>
+							아야와 마녀(디지털)
+						</td>
+
+						<td class="left">
+							16:35 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							18:50 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							21:05 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							09:40 (9,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							12:25 (11,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							15:10 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							17:55 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-15</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							10:00 (9,000원)<br>
+							파이프라인(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							12:10<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							14:20 (6,000원)<br>
+							파이프라인(디지털)
+						</td>
+
+						<td class="left">
+							16:30 (5,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+							19:00 (13,000원)<br>
+							파이프라인(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							21:10<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							09:20 (10,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							11:55 (5,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							14:30 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							17:05 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							19:40 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:20 (0원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							11:40 (11,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							14:00 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							16:20 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (9,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							21:00 (12,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							<font color="red">
+							09:15<br>
+							아야와 마녀(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							11:00 (9,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							13:15 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							15:30 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							17:45 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							20:00 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:30 (12,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							12:50 (15,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							15:10 (16,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							17:30<br>
+							캐시트럭(IMAX)
+							</font>
+						</td>
+
+
+						<td class="left">
+							19:50 (16,000원)<br>
+							캐시트럭(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							10:00 (9,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							11:50 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							13:50 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							15:50 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							18:30 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							21:10 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							<font color="red">
+							10:20<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							12:40 (11,000원)<br>
+							까치발(디지털)
+						</td>
+
+						<td class="left">
+							14:30 (13,000원)<br>
+							강호아녀(디지털)
+						</td>
+
+						<td class="left">
+							17:10 (12,000원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (13,000원)<br>
+							애플(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							20:40<br>
+							강호아녀(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:45 (13,000원)<br>
+							실크 로드(디지털)
+						</td>
+
+						<td class="left">
+							12:05 (15,000원)<br>
+							라 트라비아타(디지털)
+						</td>
+
+						<td class="left">
+							15:00 (5,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							16:50 (5,000원)<br>
+							아야와 마녀(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (10,000원)<br>
+							봄날은 간다(디지털)
+						</td>
+
+						<td class="left">
+							21:00 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							09:40 (9,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							12:25 (11,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							15:10<br>
+							분노의 질주: 더 얼티메이트(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							17:55 (10,500원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-16</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							09:50 (7,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							12:00 (8,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							14:00 (10,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							16:10 (10,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							18:10 (10,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							20:20 (10,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							10:00 (9,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							12:15 (11,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							14:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							16:35 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							18:50 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							21:05 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:30 (9,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							11:30 (11,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							13:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							15:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							17:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							19:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							21:40 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							09:50 (9,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							12:30 (11,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							15:10 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							17:50 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							20:30 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:10 (12,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							12:30 (15,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							14:30 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							16:50 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							18:50 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							21:10 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							10:10 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							12:05 (11,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							13:50 (13,000원)<br>
+							극장판 귀멸의 칼날: 무한열차편(디지털)
+						</td>
+
+						<td class="left">
+							16:10 (9,500원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							18:45 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							20:45 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							10:40 (9,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							12:20 (5,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+							14:40 (7,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							16:30 (12,000원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							18:00 (5,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+							20:10 (13,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:40 (9,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							12:00 (9,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							14:20 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							16:40 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							19:00 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							21:20 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							09:40 (9,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							12:10 (11,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							15:00 (13,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							17:30<br>
+							분노의 질주: 더 얼티메이트(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							20:20 (13,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-17</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							09:40 (7,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							12:00 (5,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							14:00 (10,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							16:00 (10,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							18:10 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							20:20 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							10:10 (9,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							12:10 (11,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (13,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							16:10 (13,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							18:10 (8,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							20:10 (13,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							22:05 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:20 (10,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							11:20 (9,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							13:20 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							15:20 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							17:20 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+							22:10 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+							10:40 (9,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							13:00<br>
+							아야와 마녀(디지털 더빙)
+							</font>
+						</td>
+
+
+						<td class="left">
+							14:50 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							17:30 (13,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							19:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							21:50 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:10 (12,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							12:30 (15,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							14:30 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							16:50 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							18:50 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							21:10 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							09:30 (9,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							11:55 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							13:50 (13,000원)<br>
+							극장판 귀멸의 칼날: 무한열차편(디지털)
+						</td>
+
+						<td class="left">
+							16:15 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							18:30 (13,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							20:50 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							10:50 (9,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							12:40<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							15:00 (13,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							16:40 (7,000원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							18:20 (5,000원)<br>
+							청춘선거(디지털)
+						</td>
+
+						<td class="left">
+							20:30 (6,500원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:50 (9,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							12:00 (11,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							16:20 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							18:30 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							09:20 (9,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							11:55 (11,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							14:20 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							17:00 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							19:45 (13,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							22:10 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-18</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							09:40 (8,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							12:00 (11,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							14:00 (11,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							16:10 (11,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							18:10 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							20:20 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							22:30 (11,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							10:10 (10,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							12:10 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							16:10 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							18:10 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							20:10 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							22:10 (14,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:20 (10,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							11:20 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							13:20 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							15:20 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							17:20 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+							22:10 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							<font color="red">
+							09:20<br>
+							아야와 마녀(디지털 더빙)
+							</font>
+						</td>
+
+
+						<td class="left">
+							11:05 (14,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							13:25 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							15:20 (14,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							17:40 (5,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							19:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							21:50 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:10 (14,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							12:30 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							14:30 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							16:50 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							18:50 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							21:10 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							<font color="red">
+							09:30<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							11:55 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							13:50 (14,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							16:10 (12,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							10:50 (5,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							12:40 (0원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							14:20<br>
+							클라이밍(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							<font color="red">
+							16:00<br>
+							낫아웃(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							18:20 (5,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							20:10 (7,000원)<br>
+							청춘선거(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:50 (10,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							12:00 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							16:20 (10,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							18:30 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							09:10 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							11:45 (7,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							16:45 (14,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							19:30 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							21:30 (14,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-19</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							09:50 (8,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							12:00 (11,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							14:00 (11,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							16:10 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							18:20 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							20:30 (11,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							09:20 (5,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							11:30 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							13:40 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							15:50 (13,500원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							18:00 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							20:10 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							22:20 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:30 (10,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							11:30 (6,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							13:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							15:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							17:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							19:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							21:40 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							09:50 (10,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							11:45 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							13:40 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							15:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							17:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							19:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							21:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:10 (12,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							12:30 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							14:30 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							16:50 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							18:50 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							21:10 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							<font color="red">
+							09:30<br>
+							프라도 위대한 미술관 (디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							11:25 (14,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							13:50 (14,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							16:05 (14,000원)<br>
+							킬러의 보디가드 2(디지털)
+						</td>
+
+						<td class="left">
+							18:25 (14,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							20:50 (14,000원)<br>
+							킬러의 보디가드 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							10:50 (10,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							12:40 (14,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+							15:00 (9,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							16:40 (14,000원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							18:20<br>
+							청춘선거(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							<font color="red">
+							20:30<br>
+							클라이밍(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:50 (15,000원)<br>
+							라 트라비아타(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							12:45<br>
+							아야와 마녀(디지털 더빙)
+							</font>
+						</td>
+
+
+						<td class="left">
+							14:30 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							16:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							09:15 (10,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							11:50 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							14:25 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							17:00 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							19:35 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							22:10 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-20</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							09:50 (8,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							12:00 (11,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							14:10 (11,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							16:10 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							18:20 (12,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							20:30 (11,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							09:15 (10,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							11:50 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							14:25 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							17:00 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							19:35 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							22:10 (14,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:30 (10,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							11:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							13:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							15:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							17:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							19:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							21:50 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							09:50 (7,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							11:45 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							13:40 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							15:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							17:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							19:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							21:40 (14,000원)<br>
+							루카(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:10 (12,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							12:30 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							14:30 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							16:50 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							18:50 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							21:10 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							09:30 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							11:25 (13,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							13:50 (14,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							16:05 (14,000원)<br>
+							킬러의 보디가드 2(디지털)
+						</td>
+
+						<td class="left">
+							18:25 (14,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							20:50 (12,000원)<br>
+							킬러의 보디가드 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							<font color="red">
+							10:50<br>
+							클라이밍(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							12:40 (14,000원)<br>
+							인트로덕션(디지털)
+						</td>
+
+						<td class="left">
+							14:20 (14,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							16:00 (12,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							18:20<br>
+							클라이밍(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							<font color="red">
+							20:10<br>
+							청춘선거(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:20 (10,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							11:30 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							13:40 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							15:50 (14,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							18:00 (10,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							20:10 (10,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							22:20 (14,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							10:40 (10,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							12:45 (10,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							14:30 (14,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							16:30 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							18:40 (14,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (7,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="tac" rowspan="9">2021-06-21</td>
+					<td class="tac">4DX</td>
+
+						<td class="left">
+							09:40 (7,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							11:50<br>
+							콰이어트 플레이스 2(4D)
+							</font>
+						</td>
+
+
+						<td class="left">
+							<font color="red">
+							13:50<br>
+							분노의 질주(4D)
+							</font>
+						</td>
+
+
+						<td class="left">
+							16:00 (10,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+							18:00 (10,000원)<br>
+							분노의 질주(4D)
+						</td>
+
+						<td class="left">
+							20:10 (10,000원)<br>
+							콰이어트 플레이스 2(4D)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">02관</td>
+
+						<td class="left">
+							10:10 (9,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							12:10 (11,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (13,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							16:10<br>
+							루카(디지털 더빙)
+							</font>
+						</td>
+
+
+						<td class="left">
+							18:10 (13,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+							20:20 (13,000원)<br>
+							루카(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">03관</td>
+
+						<td class="left">
+							09:20 (9,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							11:20 (11,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							13:20 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							15:20 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							17:20 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							19:30 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+							21:40 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">04관(SCREENX)</td>
+
+						<td class="left">
+							09:40 (9,000원)<br>
+							캐시트럭(디지털)
+						</td>
+
+						<td class="left">
+							12:00 (5,000원)<br>
+							아야와 마녀(디지털 더빙)
+						</td>
+
+						<td class="left">
+							13:50 (13,000원)<br>
+							루카(디지털 더빙)
+						</td>
+
+						<td class="left">
+							16:10 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							18:35<br>
+							콰이어트 플레이스 2(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							20:50 (13,000원)<br>
+							콰이어트 플레이스 2(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">IMAX</td>
+
+						<td class="left">
+							10:00 (12,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							12:20 (15,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							14:20 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							16:40 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+							18:40 (16,000원)<br>
+							킬러의 보디가드 2(IMAX)
+						</td>
+
+						<td class="left">
+							21:00 (16,000원)<br>
+							콰이어트 플레이스 2(IMAX)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">06관</td>
+
+						<td class="left">
+							<font color="red">
+							09:30<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							11:55 (18,000원)<br>
+							프라도 위대한 미술관 (디지털)
+						</td>
+
+						<td class="left">
+							13:50 (13,000원)<br>
+							컨저링3: 악마가 시켰다(디지털)
+						</td>
+
+						<td class="left">
+							16:05 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+							18:50 (7,000원)<br>
+							사랑하고 사랑받고 차고 차이고(디지털)
+						</td>
+
+						<td class="left">
+							21:15 (13,000원)<br>
+							분노의 질주: 더 얼티메이트(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">07관 [아트하우스]</td>
+
+						<td class="left">
+							<font color="red">
+							11:00<br>
+							클라이밍(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							<font color="red">
+							12:40<br>
+							인트로덕션(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							14:20 (13,000원)<br>
+							클라이밍(디지털)
+						</td>
+
+						<td class="left">
+							16:00 (5,000원)<br>
+							낫아웃(디지털)
+						</td>
+
+						<td class="left">
+							<font color="red">
+							18:20<br>
+							클라이밍(디지털)
+							</font>
+						</td>
+
+
+						<td class="left">
+							20:10 (13,000원)<br>
+							청춘선거(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr>
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">08관</td>
+
+						<td class="left">
+							09:50 (9,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							12:00 (8,500원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							14:10 (6,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							16:20 (6,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							18:30 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+							20:40 (13,000원)<br>
+							여고괴담 여섯번째 이야기 : 모교(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+
+				<tr class="last-child">
+					
+					<td class="tac" style="border-left: 1px solid rgb(217, 217, 217);">09관</td>
+
+						<td class="left">
+							10:50 (9,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							13:30 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							16:20 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							18:55 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+							21:30 (13,000원)<br>
+							크루엘라(디지털)
+						</td>
+
+						<td class="left">
+						</td>
+
+						<td class="left">
+						</td>
+
+				</tr>
+
+				</tbody>
+              		 </table>
+                </div>
+                
+            </div>
+            
+            <div class="tar marginT7">
+               	<a href="javascript:;" class="btn_small" onclick="fn_excel();return false;">엑셀</a>
+             </div>
+		</div>
+    </div>
+      <!-- // container -->
+	
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="/kobis/web/comm/commjs/gtag.js?id=UA-127072686-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-127072686-1');
+</script>
+
+<!-- AceCounter Log Gathering Script V.8.0.AMZ2019080601 -->
+ <script language="javascript">
+	var _AceGID=(function(){var Inf=['gtt6.acecounter.com','8080','AB2A31560820885','AW','0','NaPm,Ncisy','ALL','0']; var _CI=(!_AceGID)?[]:_AceGID.val;var _N=0;var _T=new Image(0,0);if(_CI.join('.').indexOf(Inf[3])<0){ _T.src ="https://"+ Inf[0] +'/?cookie'; _CI.push(Inf);  _N=_CI.length; } return {o: _N,val:_CI}; })();
+	var _AceCounter=(function(){var G=_AceGID;var _sc=document.createElement('script');var _sm=document.getElementsByTagName('script')[0];if(G.o!=0){var _A=G.val[G.o-1];var _G=(_A[0]).substr(0,_A[0].indexOf('.'));var _C=(_A[7]!='0')?(_A[2]):_A[3];var _U=(_A[5]).replace(/\,/g,'_');_sc.src='https:'+'//cr.acecounter.com/Web/AceCounter_'+_C+'.js?gc='+_A[2]+'&py='+_A[4]+'&gd='+_G+'&gp='+_A[1]+'&up='+_U+'&rd='+(new Date().getTime());_sm.parentNode.insertBefore(_sc,_sm);return _sc.src;}})();
+</script>
+<noscript><img src='//gtt6.acecounter.com:8080/?uid=AB2A31560820885&je=n&' border='0' width='0' height='0' alt=''></noscript>	
+<!-- AceCounter Log Gathering Script End -->
+
+<script language="javascript">
+function familySite(){
+   if (document.getElementById("familySite").value == "a2") {
+	   window.open ("http://www.kofic.or.kr");
+   } else if (document.getElementById("familySite").value == "a3") {
+	   window.open ("http://www.kobis.or.kr/kobisopenapi/homepg/main/main.do");
+   }
+}
+</script>
+<!-- AceCounter Log Gathering Script End -->
+	<div id="footer">
+    	<div class="cont">
+        	<div class="foot_link">
+                <ul class="fl">
+                    <li><a href="/kobis/business/comm/comm/openKobisIntro.do">KOBIS 소개</a></li>
+                    <li><a href="/kobis/business/comm/comm/openCinemAconnect.do">영화상영관 연동안내</a></li>
+                    <li><a href="/kobis/business/comm/comm/openPrivacyAgreement.do">개인정보처리방침</a></li>
+                    <li><a href="/kobis/business/comm/ntfy/findCustomerNotifyList.do">고객센터</a></li>
+                    <li><a href="/kobis/business/comm/bord/listMyTip.do?bizLogicType=3">정보수정요청</a></li>
+                    <li><a href="/kobis/business/comm/comm/openSiteMap.do">사이트맵</a></li>
+                </ul>
+                <div class="sites">
+                	<select class="slt" id="familySite" name="familySite" onchange="familySite();" style="position: absolute; opacity: 0; font-size: 14px;">
+                    	<option value="a1">Family Site</option>
+                    	<option value="a2">KOFIC</option>
+                    	<option value="a3">OpenAPI</option>
+                    </select><span class="slt_cover"><span class="slt_coverInner">Family Site</span></span>
+                </div>
+            </div>
+            <div class="foot_info">
+            	<strong class="fl"><a href="#none" class="block"><img src="/kobis/web/comm/images/comm/footer_logo.png" alt="KOFIC 영화진흥위원회 - Korean Film Council"></a></strong>
+                <div class="ovf">
+                	<span style="margin-right: 17px;">(48058) 부산광역시 해운대구 수영강변대로 130(우동)</span>
+                    <span style="margin-right: 17px;">고객센터:&nbsp;02-6261-6573</span>
+                    <span style="margin-right: 17px;">이용시간: 09:00 ~ 18:00(평일)</span>
+                    <span style="margin-right: 17px;">E-mail:&nbsp;kobis@kofic.or.kr</span>
+                    <p>COPYRIGHT(C) KOREAN FILM COUNCIL ALL RIGHTS RESERVED.</p>
+            	</div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+
+<div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div></body></html>

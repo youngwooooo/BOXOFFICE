@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="seat">
+	
+	<resultMap class="common.vo.CodeVO" id="seatMap">
+		<result property="groupCd" column="GROUP_CD"/>
+		<result property="groupCdName" column="GROUP_CD_NAME"/>
+		<result property="cd" column="CD"/>
+		<result property="cdName" column="CD_NAME"/>
+		<result property="cdDesc" column="CD_DESC"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+	</resultMap>
+
+	<select id="retrieveSeatList" resultMap="seatMap">
+		SELECT GROUP_CD
+			 , GROUP_CD_NAME
+			 , CD
+			 , CD_NAME
+			 , CD_DESC
+			 , DELETE_YN
+		FROM TB_CODE
+		WHERE GROUP_CD = 'A04'
+	</select>
+
+	<select id="retrieveSeat" parameterClass="common.vo.CodeVO" resultMap="seatMap">
+		SELECT GROUP_CD
+			 , GROUP_CD_NAME
+			 , CD
+			 , CD_NAME
+			 , CD_DESC
+			 , DELETE_YN
+		FROM TB_CODE
+		WHERE GROUP_CD = 'A04'
+		  AND CD = #cd#
+	</select>
+	
+	<select id="retrieveMaxSeatCode" parameterClass="common.vo.CodeVO" resultClass="int">
+		SELECT MAX(TO_NUMBER(CD))
+		FROM TB_CODE
+		WHERE GROUP_CD = 'A04'
+	</select>
+	
+	<insert id="createSeat" parameterClass="common.vo.CodeVO">
+		INSERT INTO TB_CODE (GROUP_CD
+						   , GROUP_CD_NAME
+						   , CD
+						   , CD_NAME
+						   , CD_DESC
+						   , DELETE_YN)
+		VALUES ('A04'
+			  , '좌석유형'
+			  , #cd#
+			  , #cdName#
+			  , #cdDesc#
+			  , #deleteYn#)
+	</insert>
+	
+	<update id="modifySeat" parameterClass="common.vo.CodeVO">
+		UPDATE TB_CODE
+		SET CD_NAME = #cdName#
+		  , CD_DESC = #cdDesc#
+		  , DELETE_YN = #deleteYn#
+		WHERE GROUP_CD = 'A04'
+		  AND CD = #cd#
+	</update>
+	
+	<delete id="deleteSeat" parameterClass="common.vo.CodeVO">
+		DELETE FROM TB_CODE
+		WHERE GROUP_CD = 'A04'
+		  AND CD = #cd#
+	</delete>
+	
+</sqlMap>			

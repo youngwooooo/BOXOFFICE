@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="memberInfo">
+	
+	
+	<select id="retrieveMember" parameterClass="String" resultClass="common.vo.MemberVO">
+		SELECT 
+			MEM_CD        memCd      
+            ,MEM_NAME     memName   
+            ,MEM_ID       memId     
+            ,MEM_PASS     memPass   
+            ,MEM_HP       memHp     
+            ,MEM_MAIL     memMail   
+            ,MEM_BIR      memBir    
+            ,MEM_ZIP      memZip    
+            ,MEM_ADDR1    memAddr1  
+            ,MEM_ADDR2    memAddr2  
+            ,MS_CD        msCd      
+            ,MEM_MILEAGE  memMileage
+            ,JOIN_DATE    joinDate  
+            ,MANAGER_YN   managerYn 
+            ,DELETE_YN    deleteYn  
+<!--             ,MEM_IMG      memImg     -->
+         FROM 
+           tb_member
+         WHERE MEM_ID = #memId#
+	</select>
+	
+	<select id="retrieveMemberByMemPass" parameterClass="String" resultClass="common.vo.MemberVO">
+		SELECT 
+			MEM_CD       memCd     
+            ,MEM_NAME    memName   
+            ,MEM_ID      memId     
+            ,MEM_PASS    memPass   
+            ,MEM_HP      memHp     
+            ,MEM_MAIL    memMail   
+            ,MEM_BIR     memBir    
+            ,MEM_ZIP     memZip    
+            ,MEM_ADDR1   memAddr1  
+            ,MEM_ADDR2   memAddr2  
+            ,MS_CD       msCd      
+            ,MEM_MILEAGE memMileage
+            ,JOIN_DATE   joinDate  
+            ,MANAGER_YN  managerYn 
+            ,DELETE_YN   deleteYn  
+<!--             ,MEM_IMG     memImg     -->
+         FROM 
+           tb_member
+         WHERE MEM_PASS = #memPass#
+         AND MEM_ID = #memId#
+	</select>
+	
+	
+	<update id="updateMemInfo">
+		UPDATE tb_member
+		  SET mem_name = #memName#
+		  , mem_hp = #memHp#
+		  , mem_mail = #memMail#
+		  , mem_zip = #memZip#
+		  , mem_addr1 = #memAddr1#
+		  , mem_addr2 = #memAddr2#
+		 WHERE mem_id = #memId# 
+	</update>
+	
+	<delete id="deleteMemInfo">
+		DELETE FROM tb_member
+		  WHERE mem_id = #memId#
+	</delete>
+</sqlMap>			

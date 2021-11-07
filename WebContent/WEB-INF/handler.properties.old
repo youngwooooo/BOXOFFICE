@@ -1,0 +1,120 @@
+# \ud2b9\uc815 url\uc5d0 \ub300\ud55c command\uac1d\uccb4\ub97c \ub9e4\ud551\ud574\uc90c.
+# \uc608\uc2dc /coupon/list.do=ourhouse.coupon.handler.ListCouponHandler
+
+#BJH
+# screen manage
+/admin/screen.do=admin.cinema.handler.ScreenListHandler
+/admin/screenCreate.do=admin.cinema.handler.ScreenCreateHandler
+/admin/screenModify.do=admin.cinema.handler.ScreenModifyHandler
+/admin/screenDelete.do=admin.cinema.handler.ScreenDeleteHandler
+# cinema manage
+/admin/cinemaCreate.do=admin.cinema.handler.CinemaCreateHandler
+/admin/cinemaModify.do=admin.cinema.handler.CinemaModifyHandler
+/admin/cinemaDelete.do=admin.cinema.handler.CinemaDeleteHandler
+/admin/cinemaListRetrieve.do=admin.cinema.handler.CinemaListRetrieveHandler
+/admin/cinemaRetrieve.do=admin.cinema.handler.CinemaRetrieveHandler
+/admin/seatDeleteYnModify.do=admin.cinema.handler.SeatDeleteYnModifyHandler
+/admin/seatListRetrieve.do=admin.cinema.handler.SeatListRetrieveHandler
+# sign in
+/member/signIn.do=member.signin.handler.SignInHandler
+/member/signOut.do=member.signout.handler.SignOutHandler
+# ticketing
+/member/setTicketingMain.do=member.ticketing.handler.SetTicketingMainHandler
+/member/retrieveTicketingShow.do=member.ticketing.handler.RetrieveTicketingShowHandler
+/member/SetTicketingSeat.do=member.ticketing.handler.SetTicketingSeatHandler
+/member/retrieveTicketingSeat.do=member.ticketing.handler.RetrieveTicketingSeatHandler
+/member/retrieveTicketingPrice.do=member.ticketing.handler.RetrieveTicketingPriceHandler
+/member/setTicketingPay.do=member.ticketing.handler.SetTicketingPayHandler
+
+#LYW
+# member
+/admin/memberList.do=admin.member.handler.ListMemberHandler
+/admin/memberSearch.do=admin.member.handler.SearchMemberHandler
+/admin/memberDetail.do=admin.member.handler.DetailMemberHandler
+# product
+/admin/product.do=admin.product.handler.ProductListHandler
+/admin/productInsert.do=admin.product.handler.ProductInsertHandler
+/admin/productDelete.do=admin.product.handler.ProductDeleteHandler
+# memberProduct
+/member/product/memberProductDetail.do=member.product.handler.MemberProductDetailHandler
+/member/product/memberProductList.do=member.product.handler.MemberProductListHandler
+
+#CYJ
+/member/movielist.do=member.movie.handler.ListMovieHandler
+/member/movieUpdate.do=member.movie.handler.UpdateMovieHandler
+
+# movieRating
+/admin/movieRating.do=admin.movierating.handler.MovieRatingListHandler
+/admin/movieRatingCreate.do=admin.movierating.handler.MovieRatingCreateHandler
+/admin/movieRatingModify.do=admin.movierating.handler.MovieRatingModifyHandler
+/admin/movieRatingDelete.do=admin.movierating.handler.MovieRatingDeleteHandler
+# ticketing
+#/member/ticketing/ticketing.do=member.ticketing.handlerticketingHandler
+
+
+
+#LYG
+# charge
+/admin/charge.do=admin.charge.handler.ChargeListHandler
+/admin/chargeCreate.do=admin.charge.handler.ChargeCreateHandler
+/admin/chargeModify.do=admin.charge.handler.ChargeModifyHandler
+/admin/chargeDelete.do=admin.charge.handler.ChargeDeleteHandler
+# audience
+/admin/audience.do=admin.audience.handler.AudienceListHandler
+/admin/audienceCreate.do=admin.audience.handler.AudienceCreateHandler
+/admin/audienceModify.do=admin.audience.handler.AudienceModifyHandler
+/admin/audienceDelete.do=admin.audience.handler.AudienceDeleteHandler
+# time
+/admin/time.do=admin.time.handler.TimeListHandler
+/admin/timeCreate.do=admin.time.handler.TimeCreateHandler
+/admin/timeModify.do=admin.time.handler.TimeModifyHandler
+/admin/timeDelete.do=admin.time.handler.TimeDeleteHandler
+# seat
+/admin/seat.do=admin.seat.handler.SeatListHandler
+/admin/seatCreate.do=admin.seat.handler.SeatCreateHandler
+/admin/seatModify.do=admin.seat.handler.SeatModifyHandler
+/admin/seatDelete.do=admin.seat.handler.SeatDeleteHandler
+# showtimetable
+/admin/showtimetable.do=admin.showtimetable.handler.ShowTimetableListHandler
+# notice member
+/member/notice.do=member.board.handler.NoticeListHandler
+/member/noticeDetail.do=member.board.handler.NoticeDetailHandler
+# event member
+/member/event.do=member.board.handler.EventListHandler
+/member/eventDetail.do=member.board.handler.EventDetailHandler
+
+
+#LJB
+#category
+/admin/manageCategory.do=admin.movie.handler.ManageCategoryHandler
+#signUp
+/common/signUpPage.do=member.signup.handler.SignUpHandler
+/common/memberResult.do=member.signup.handler.checkUserIdHandler
+#memberInfo
+/member/passing.do=member.mypage.memberInfo.handler.PassingHandler
+#questionsBoard
+/member/insertQuestionsBoard.do=member.board.handler.InsertQuestionsBoardHandler
+/member/questionsBoard.do=member.board.handler.QuestionsListHandler
+
+#CYJ
+/admin/movieInsert.do=admin.movie.handler.InsertMovieHandler
+/admin/movielist.do=admin.movie.handler.ListMovieHandler
+/admin/movieUpdate.do=admin.movie.handler.UpdateMovieHandler
+/admin/movieDelete.do=admin.movie.handler.DeleteMovieHandler
+/filedownload.do=common.handler.FileDownloadHandler
+
+#KSY
+#notice manage
+/admin/mainBoard.do=admin.board.handler.ListBoardHandler
+/admin/insertNotice.do=admin.board.handler.insertNoticeHandler
+/admin/detailNotice.do=admin.board.handler.detailNoticeHandler
+/admin/updateNotice.do=admin.board.handler.updateNoticeHandler
+/admin/deleteNotice.do=admin.board.handler.deleteNoticeHandler
+#event manage
+/admin/mainBoard2.do=admin.board.handler.ListBoard2Handler
+/admin/insertEvent.do=admin.board.handler.insertEventHandler
+/admin/detailEvent.do=admin.board.handler.detailEventHandler
+/admin/updateEvent.do=admin.board.handler.updateEventHandler
+/admin/deleteEvent.do=admin.board.handler.deleteEventHandler
+
+

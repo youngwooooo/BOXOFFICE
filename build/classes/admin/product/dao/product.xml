@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="product">
+	
+	<resultMap class="common.vo.ProductVO" id="productMap">
+		<result property="prodCd" column="PROD_CD"/>
+		<result property="prodName" column="PROD_NAME"/>
+		<result property="prodPrice" column="PROD_PRICE"/>
+		<result property="prodTypeCd" column="PROD_TYPE_CD"/>
+		<result property="prodDesc" column="PROD_DESC"/>
+		<result property="atchFileCd" column="ATCH_FILE_CD"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.ProductTypeVO" id="productTypeMap">
+		<result property="prodTypeCd" column="PROD_TYPE_CD"/>
+		<result property="prodTypeName" column="PROD_TYPE_NAME"/>
+	</resultMap>
+
+	<select id="retrieveProductList" resultMap="productMap">
+		SELECT *
+		FROM TB_PRODUCT
+	</select>
+
+	<select id="retrieveProduct" parameterClass="common.vo.ProductVO" resultMap="productMap">
+		SELECT *
+		FROM TB_PRODUCT
+		WHERE PROD_CD = #prodCd#
+	</select>
+	
+	<insert id="createProduct" parameterClass="common.vo.ProductVO">
+		INSERT INTO TB_PRODUCT (PROD_CD
+							 , PROD_NAME
+							 , PROD_PRICE
+							 , PROD_TYPE_CD
+							 , PROD_DESC
+							 , ATCH_FILE_CD)
+		VALUES ( #prodCd#
+			  , #prodName#
+			  , #prodPrice#
+			  , #prodTypeCd#
+			  , #prodDesc#
+			  , #atchFileCd#)
+	</insert>
+	
+	<update id="modifyProduct" parameterClass="common.vo.ProductVO">
+		UPDATE TB_PRODUCT
+		SET PROD_NAME = #prodName#
+		  , PROD_PRICE = #prodPrice#
+		  , PROD_TYPE_CD = #prodTypeCd#
+		  , PROD_DESC = #prodDesc#
+		  , ATCH_FILE_CD = #atchFileCd#
+		WHERE PROD_CD = #prodCd#
+	</update>
+	
+	<delete id="deleteProduct" parameterClass="common.vo.ProductVO">
+		DELETE FROM TB_PRODUCT
+		WHERE PROD_CD = #prodCd#
+	</delete>
+	
+	<select id="productTypeList" resultMap="productTypeMap">
+		SELECT *
+		FROM TB_PRODUCT_TYPE
+	</select>
+		
+</sqlMap>			

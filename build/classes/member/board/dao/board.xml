@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="boardMem">
+	<resultMap class="common.vo.PostVO" id="BoardMap">
+	
+		<result property="boardName" column="BOARD_NAME"/>
+		<result property="postCd" column="POST_CD"/>
+		<result property="postTitle" column="POST_TITLE"/>
+<!-- 		<result property="postContent" column="POST_CONTENT"/> -->
+<!-- 		<result property="memCd" column="MEM_CD"/> -->
+<!-- 		<result property="nonmemName" column="NONMEM_NAME"/> -->
+<!-- 		<result property="nonmemHp" column="NONMEM_HP"/> -->
+<!-- 		<result property="nonmemPostPass" column="NONMEM_POST_PASS"/> -->
+<!-- 		<result property="boardCd" column="BOARD_CD"/> -->
+		<result property="postDate" column="POST_DATE"/>
+		<result property="postView" column="POST_VIEW"/>
+<!-- 		<result property="postLockYn" column="POST_LOCK_YN"/> -->
+<!-- 		<result property="atchFileCd" column="ATCH_FILE_CD"/> -->
+	</resultMap>
+	
+	<!-- 문의사항 조회를 위한  -->
+<!-- 	<select id="getQuestionsBoardList" resultMap="BoardMap"> -->
+<!-- 		SELECT b.BOARD_NAME, a.POST_CD, a.POST_TITLE, a.POST_DATE, a.POST_VIEW  -->
+<!-- 		    FROM TB_POST a, TB_BOARD b -->
+<!-- 		  WHERE a.board_cd = b.board_cd -->
+<!-- 		    AND a.board_cd = 'BD03' -->
+<!-- 		   ORDER BY a.post_date DESC -->
+<!-- 	</select> -->
+	
+	<select id="getQuestionsBoardList" resultMap="BoardMap">	   
+		   SELECT AA.*
+		   FROM
+		   (SELECT A.*, ROWNUM AS rnum
+		   FROM
+		   (SELECT b.BOARD_NAME, a.POST_CD, a.POST_TITLE, TO_CHAR(a.POST_DATE, 'yyyy-mm-dd') as POST_DATE, a.POST_VIEW
+		     FROM TB_POST a, TB_BOARD b
+		     WHERE a.board_cd = b.board_cd
+		    	AND a.board_cd = 'BD03'
+		      ORDER BY a.post_date DESC) A) AA
+		     WHERE AA.rnum BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+	
+	<select id="getTotalCnt" resultClass="int"> 		
+ 		SELECT COUNT(*) AS cnt
+		  FROM TB_POST a, TB_BOARD b 
+		WHERE a.board_cd = b.board_cd
+		    	AND a.board_cd = 'BD03'
+		    	 ORDER BY a.post_date DESC	
+ 	</select>
+
+	<select id="getAllBoardList" resultMap="BoardMap">
+	
+		SELECT b.BOARD_NAME
+			 ,a.POST_CD
+			 ,a.POST_TITLE
+			 ,a.POST_DATE
+			 ,a.POST_VIEW
+		FROM TB_POST a, TB_BOARD b
+		WHERE a.board_cd = b.board_cd
+		AND a.board_cd = 'BD01'
+		ORDER BY a.post_date desc
+
+	</select>
+	
+	<insert id="insertNotice" parameterClass="common.vo.PostVO">
+		insert into tb_post
+		(POST_CD, POST_TITLE, POST_CONTENT, POST_DATE, BOARD_CD)
+		values
+		(#postCd#, #postTitle#, #postContent#, sysdate, #boardCd#)
+	</insert>
+	
+	<select id="checkNotice" resultClass="int">
+		
+		select count(*) as cnt form tb_post where POST_CD = #postCd#
+		
+	</select>
+	
+	<resultMap class="common.vo.PostVO" id="detailNoticeMap">
+	
+		<result property="postCd" column="POST_CD"/>
+		<result property="postTitle" column="POST_TITLE"/>
+		<result property="postContent" column="POST_CONTENT"/>
+		<result property="postDate" column="POST_DATE"/>
+		<result property="postView" column="POST_VIEW"/>
+	</resultMap>
+	
+	<select id="detailNotice" resultMap="detailNoticeMap">
+		SELECT POST_CD 
+			 ,POST_TITLE
+			 ,POST_CONTENT
+			 , POST_DATE
+			 , POST_VIEW
+		FROM TB_POST
+		WHERE POST_CD = #postCd#
+	</select>
+	
+	
+	<select id="getBoard" resultMap="detailNoticeMap">
+		
+		select * from tb_post where post_cd = #postCd#
+	</select>
+	
+	<update id="updateNotice" parameterClass="common.vo.PostVO">
+		update tb_post
+			set POST_CD = #postCd#
+				,POST_TITLE = #postTitle#
+				,POST_CONTENT = #postContent#
+				,POST_DATE = sysdate
+				where post_cd = #postCd#
+				
+	</update>
+	
+	<delete id="deleteNotice" parameterClass="String">
+		
+		delete from tb_post where post_cd = #postCd#
+	</delete>
+	
+	<select id="getAllBoardList2" resultMap="BoardMap">
+	
+		SELECT b.BOARD_NAME
+			 ,a.POST_CD
+			 ,a.POST_TITLE
+			 ,a.POST_DATE
+			 ,a.POST_VIEW
+		FROM TB_POST a, TB_BOARD b
+		WHERE a.board_cd = b.board_cd
+		AND a.board_cd = 'BD02'
+
+	</select>
+	
+	<insert id="insertEvent" parameterClass="common.vo.PostVO">
+		insert into tb_post
+		(POST_CD, POST_TITLE, POST_CONTENT, POST_DATE, BOARD_CD)
+		values
+		(#postCd#, #postTitle#, #postContent#, sysdate, #boardCd#)
+	</insert>
+	
+<!-- 	<select id="getTotalCnt" resultClass="int"> -->
+		
+<!-- 		select count(*) as cnt -->
+<!-- 		from tb_post -->
+<!-- 	</select> -->
+</sqlMap>

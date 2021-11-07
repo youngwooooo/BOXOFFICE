@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ticketing">
+	
+	<resultMap class="common.vo.TicketingVO" id="ticketingMap">
+		<result property="mvCd"			   column="MV_CD"/>
+		<result property="mvNameKor" 	   column="MV_NAME_KOR"/>
+		<result property="showStartTime"   column="SHOW_START_TIME"/>
+		<result property="cinemaCd"        column="CINEMA_CD"/>
+		<result property="cinemaName"      column="CINEMA_NAME"/>
+		<result property="theaterCd"       column="THEATER_CD"/>
+		<result property="theaterNo"       column="THEATER_NO"/>
+		<result property="screenCd"        column="SCREEN_CD"/>
+		<result property="showCd"          column="SHOW_CD"/>
+		<result property="showDate"        column="SHOW_DATE"/>
+		<result property="showStartTime"   column="SHOW_START_TIME"/>
+		<result property="showEndTime"	   column="SHOW_END_TIME"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.MovieVO" id="MovieMap">
+		<result property="mvCd"	   column="MV_CD"/>
+		<result property="mvNameKor"	   column="MV_NAME_KOR"/>
+		<result property="fileStoreName" column="FILE_STORE_NAME"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.CinemaVO" id="CinemaMap">
+		<result property="cinemaCd"	   column="CINEMA_CD"/>
+		<result property="cinemaName"	   column="CINEMA_NAME"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.TicketingShowVO" id="TicketingShowMap">
+		<result property="showCd" column="SHOW_CD"/>
+		<result property="mvCd" column="MV_CD"/>
+		<result property="mvNameKor" column="MV_NAME_KOR"/>
+		<result property="cinemaCd" column="CINEMA_CD"/>
+		<result property="cinemaName" column="CINEMA_NAME"/>
+		<result property="theaterCd" column="THEATER_CD"/>
+		<result property="theaterNo" column="THEATER_NO"/>
+		<result property="screenCd" column="SCREEN_CD"/>
+		<result property="screenName" column="SCREEN_NAME"/>
+		<result property="showDate" column="SHOW_DATE"/>
+		<result property="showStartTime" column="SHOW_START_TIME"/>
+		<result property="showEndTime" column="SHOW_END_TIME"/>
+		<result property="fileStoreName"   column="FILE_STORE_NAME"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.SeatVO" id="SeatMap">
+		<result property="seatCd" column="SEAT_CD"/>
+		<result property="theaterCd" column="THEATER_CD"/>
+		<result property="seatNo" column="SEAT_NO"/>
+		<result property="seatTypeCd" column="SEAT_TYPE_CD"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+	</resultMap>
+	
+	<resultMap class="common.vo.TheaterVO" id="TheaterMap">
+		<result property="theaterCd" column="THEATER_CD"/>
+		<result property="cinemaCd" column="CINEMA_CD"/>
+		<result property="theaterNo" column="THEATER_NO"/>
+		<result property="screenCd" column="SCREEN_CD"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+		<result property="rowCount" column="ROW_COUNT"/>
+		<result property="colCount" column="COL_COUNT"/>
+	</resultMap>
+	
+
+	<select id="getTicketingInfoList" resultClass="common.vo.TicketingVO">
+		SELECT
+		    b.mv_name_kor mvNameKor,
+		    a.show_date showDate,
+		    a.show_start_time showStartTime,
+		    a.show_end_time showEndTime,
+		    d.cinema_name cinemaName,
+		    c.theater_no theaterNo,
+		    c.screen_cd  screenCd, 
+		    c.theater_cd theaterCd
+		FROM
+		    tb_show a,
+		    tb_movie b,
+		    tb_theater c,
+		    tb_cinema d
+		 WHERE A.MV_CD = B.MV_CD
+		   AND A.THEATER_CD = C.THEATER_CD
+		   AND TO_CHAR(SHOW_DATE, 'YYYY.MM.DD (DY)') = #showDate#
+		   AND A.THEATER_CD IN (SELECT THEATER_CD
+		                          FROM TB_THEATER
+		                         WHERE CINEMA_CD = #cinemaCd#)
+           AND B.MV_NAME_KOR = #mvNameKor#
+           AND A.SHOW_START_TIME = #showStartTime#
+           AND D.CINEMA_CD = #cinemaCd#
+	</select>
+	
+	<select id="retrieveTicketingShow" parameterClass="common.vo.TicketingShowVO" resultMap="TicketingShowMap">
+		SELECT S.SHOW_CD
+			 , S.MV_CD
+			 , M.MV_NAME_KOR
+			 , A.CINEMA_CD
+			 , A.CINEMA_NAME
+			 , S.THEATER_CD
+			 , T.THEATER_NO
+			 , T.SCREEN_CD
+			 , FN_GETCODENAME('A05', T.SCREEN_CD) AS SCREEN_NAME
+			 , S.SHOW_DATE
+			 , S.SHOW_START_TIME
+			 , S.SHOW_END_TIME
+			 , F.FILE_STORE_NAME
+		FROM TB_SHOW S,
+			 TB_MOVIE M, 
+			 (SELECT C.CINEMA_CD
+				   , C.CINEMA_NAME
+				   , T.THEATER_CD
+			  FROM TB_CINEMA C, TB_THEATER T
+			  WHERE C.CINEMA_CD = T.CINEMA_CD
+		<isNotEmpty property="cinemaCd">
+				AND C.CINEMA_CD = #cinemaCd#
+		</isNotEmpty>
+			  ) A,
+			 TB_THEATER T,
+			 TB_ATCH_FILE_DETAIL F
+		WHERE S.MV_CD = M.MV_CD
+		  AND S.THEATER_CD = A.THEATER_CD
+		  AND A.THEATER_CD = T.THEATER_CD
+		  AND M.ATCH_FILE_CD = F.ATCH_FILE_CD(+)
+		<isNotEmpty property="mvCd">
+		  AND S.MV_CD = #mvCd#
+		</isNotEmpty>
+		<isNotEmpty property="showDate">
+		  AND TO_CHAR(S.SHOW_DATE, 'YYYY-MM-DD') = #showDate#
+		</isNotEmpty>
+	</select>
+	
+	<!-- 영화 모든 목록 조회 -->
+	<select id="retrieveMovieList" resultMap="MovieMap">
+		SELECT M.MV_CD
+			 , M.MV_NAME_KOR
+			 , F.FILE_STORE_NAME
+		FROM TB_MOVIE M
+		   , TB_ATCH_FILE_DETAIL F
+		WHERE SHOW_YN = 'Y'
+		  AND M.ATCH_FILE_CD = F.ATCH_FILE_CD(+)
+	</select>
+	
+	<!-- 극장 모든 목록 조회 -->
+	<select id="retrieveCinemaList" resultMap="CinemaMap">
+		SELECT CINEMA_CD, CINEMA_NAME
+		FROM TB_CINEMA
+		WHERE CINEMA_STATUS_CD = '01'
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="retrieveTheater" parameterClass="String" resultMap="TheaterMap">
+		SELECT THEATER_CD
+			 , CINEMA_CD
+			 , THEATER_NO
+			 , SCREEN_CD
+			 , DELETE_YN
+			 , ROW_COUNT
+			 , COL_COUNT
+		FROM TB_THEATER
+		WHERE THEATER_CD = #theaterCd#
+	</select>
+	
+	<select id="retrieveSeatList" parameterClass="String" resultMap="SeatMap">
+		SELECT SEAT_CD
+		     , THEATER_CD
+		     , SEAT_NO
+		     , SEAT_TYPE_CD
+		     , DELETE_YN
+		FROM TB_SEAT
+		WHERE THEATER_CD = #theaterCd#
+		ORDER BY TO_NUMBER(SUBSTR(SEAT_CD, 3))
+	</select>
+	
+	<select id="retrievePrice" parameterClass="common.vo.ChargeVO" resultClass="int">
+		SELECT PRICE
+		FROM TB_CHARGE
+		WHERE WEEKEND_YN = #chgWeekendYn#
+		  AND AUDIENCE_CD = #chgAudienceCd#
+		  AND TIME_CD = #chgTimeCd#
+		  AND SEAT_CD = #chgSeatCd#
+		  AND SCREEN_CD = #chgScreenCd#
+	</select>
+	
+	<!-- 결제 테이블 -->
+	<select id="retrieveMaxPaymentCode" resultClass="int">
+		SELECT MAX(TO_NUMBER(SUBSTR(PAY_CD, 3)))
+		  FROM TB_PAYMENT
+	</select>
+	
+	<insert id="createPayment">
+		INSERT INTO TB_PAYMENT (PAY_CD
+								, MEM_CD
+								, PAY_DATE
+								, PAY_CANCEL_YN)
+		VALUES (#payCd#
+				, #memCd#
+				, SYSDATE
+				, 'N')
+	</insert>
+	
+	<!-- 티켓 테이블 -->
+	<select id="retrieveMaxTicketCode" resultClass="int">
+		SELECT MAX(TO_NUMBER(SUBSTR(TICKET_CD, 2)))
+		  FROM TB_TICKET
+	</select>
+	
+	<insert id="createTicket">
+		INSERT INTO TB_TICKET (TICKET_CD
+								, PAY_CD
+								, SHOW_CD
+								, TOTAL_PRICE)
+		VALUES (#ticketCd#
+				, #payCd#
+				, #showCd#
+				, #totalPrice#)
+	</insert>
+	
+	<!-- 티켓 상세 테이블 -->
+	<insert id="createTicketDetail">
+		INSERT INTO TB_TICKET_DETAIL (TICKET_CD
+									  , SEAT_CD
+									  , AUDIENCE_TYPE_CD
+									  , TICKET_PRICE)
+		VALUES (#ticketCd#
+				, #seatCd#
+				, #audienceTypeCd#
+				, #ticketPrice#)
+	</insert>
+	
+	<select id="retrieveAllPaySeatList" parameterClass="String" resultClass="common.vo.SeatVO">
+		$retrieveAllPaySeatList$
+	</select>
+	
+	<insert id="createTicketAll" parameterClass="String">
+		$sql$
+	</insert>
+	
+</sqlMap>			

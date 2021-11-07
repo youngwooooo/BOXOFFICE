@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 영화 장르 카테고리 관리를 위해서 -->
+<!-- 작성자: 정범 -->
+<sqlMap namespace="genre">
+	
+	<resultMap class="common.vo.GenreVO" id="genreMap">
+		<result property="mvCd" column="MV_CD"></result>
+		<result property="genreCd" column="GENRE_CD"></result>
+	</resultMap>
+	
+	<resultMap class="common.vo.CodeVO" id="codeMap1">
+		<result property="groupCd" column="GROUP_CD"/>
+		<result property="groupCdName" column="GROUP_CD_NAME"/>
+		<result property="cd" column="CD"/>
+		<result property="cdName" column="CD_NAME"/>
+		<result property="cdDesc" column="CD_DESC"/>
+		<result property="deleteYn" column="DELETE_YN"/>
+	</resultMap>	
+	
+	<resultMap class="common.vo.CodeVO" id="codeMap2">
+		<result property="groupCd" column="GROUP_CD"/>
+		<result property="cdName" column="CD_NAME"/>
+	</resultMap>
+	
+	<select id="getAllGenreList" resultMap="codeMap2">	
+<!-- 		SELECT * -->
+<!--   		  FROM tb_code -->
+<!--  		 WHERE group_cd = 'A06' 		  -->
+		SELECT AA.*
+		FROM
+		(SELECT A.*, ROWNUM AS rnum
+		FROM
+		(SELECT group_cd
+		       ,cd_name
+		  FROM tb_code
+		  WHERE group_cd='A06') A) AA
+		 WHERE AA.rnum BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+	
+	<!-- input창에 입력하고 등록을 클릭하면 등록, 등록시 TB_CODE테이블의 CD_NAME컬럼에 등록 -->
+	<insert id="insertGenreObject" parameterClass="common.vo.CodeVO">
+		INSERT INTO tb_code(group_cd, group_cd_name, cd, cd_name, cd_desc, delete_yn)
+		  VALUES('A06', '장르', #cd#, #cdName#, #cdName#, 'N')
+	</insert>
+	
+	<update id="updateGenreObject">
+		UPDATE tb_code
+  		  SET cd_name=#cdName#
+ 		 WHERE cd=##
+	</update>
+	
+	<delete id="deleteGenreObject">
+		DELETE 
+		  FROM tb_code
+		 WHERE cd_name=##
+	</delete>
+	
+	<select id="getTotalCnt" resultClass="int"> 		
+ 		SELECT COUNT(*) AS cnt
+		  FROM tb_code 
+		 WHERE group_cd='A06'	
+ 	</select>
+	
+</sqlMap>			
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 영화 장르 카테고리 관리를 위해서 -->
+<!-- 작성자: 정범 -->
+<sqlMap namespace="memberForSignUp">
+
+	<resultMap class="common.vo.MemberVO" id="memberInfo">
+		<result property="memCd" column="mem_cd"/>
+		<result property="memName" column="mem_name"/>
+		<result property="memId" column="mem_id"/>
+		<result property="memPass" column="mem_pass"/>
+		<result property="memHp" column="mem_hp"/>
+		<result property="memMail" column="mem_mail"/>
+		<result property="memBir" column="mem_bir"/>
+		<result property="memZip" column="mem_zip"/>
+		<result property="memAddr1" column="mem_addr1"/>
+		<result property="memAddr2" column="mem_addr2"/>
+		<result property="msCd" column="ms_cd"/>
+		<result property="memMileage" column="mem_mileage"/>
+		<result property="joinDate" column="join_date"/>
+		<result property="managerYn" column="manager_yn"/>
+		<result property="deleteYn" column="delete_yn"/>
+		<result property="memImg" column="mem_img"/>		
+	</resultMap>	
+
+	
+	<!-- input창에 입력하고 등록을 클릭하면 등록, 등록시 TB_CODE테이블의 CD_NAME컬럼에 등록 -->
+	<insert id="insertMemberInfo" parameterClass="common.vo.MemberVO">
+		INSERT INTO tb_member(MEM_CD
+                        ,MEM_NAME
+                        ,MEM_ID
+                        ,MEM_PASS
+                        ,MEM_HP
+                        ,MEM_MAIL
+                        ,MEM_BIR
+                        ,MEM_ZIP
+                        ,MEM_ADDR1
+                        ,MEM_ADDR2
+                        ,MS_CD
+                        ,MEM_MILEAGE
+                        ,JOIN_DATE
+                        ,MANAGER_YN
+                        ,DELETE_YN
+                        ,MEM_IMG)
+		    VALUES((select 'M' || lpad(aa.num, 7, '0')
+						from
+					  (select TO_NUMBER(substr(a.mem_cd, 2)) + 1 as num
+					   from
+					 (select max(mem_cd) mem_cd from tb_member) a ) aa)
+		    , #memName#
+		    , #memId#
+		    , #memPass#
+		    , #memHp#
+		    , #memMail#
+		    , #memBir#
+		    , #memZip#
+		    , #memAddr1#
+		    , #memAddr2#
+		    , 'MS03'
+		    , 0
+		    , SYSDATE
+		    , 'N'
+		    , 'N'
+		    , null)
+	</insert>
+
+	<select id="retrieveMemberByMemId" parameterClass="String" resultClass="common.vo.MemberVO">
+		SELECT 
+			MEM_CD
+            ,MEM_NAME
+            ,MEM_ID
+            ,MEM_PASS
+            ,MEM_HP
+            ,MEM_MAIL
+            ,MEM_BIR
+            ,MEM_ZIP
+            ,MEM_ADDR1
+            ,MEM_ADDR2
+            ,MS_CD
+            ,MEM_MILEAGE
+            ,JOIN_DATE
+            ,MANAGER_YN
+            ,DELETE_YN
+            ,MEM_IMG
+         FROM 
+           tb_member
+         WHERE MEM_ID = #memId#
+	</select>
+	
+	<select id="retrieveMaxMemCd" resultClass="int">
+		SELECT MAX(TO_NUMBER(SUBSTR(MEM_CD, 2)))
+		FROM TB_MEMBER
+	</select>
+	
+	<insert id="createMember">
+		INSERT INTO TB_MEMBER (MEM_CD
+							 , MEM_NAME
+							 , MEM_ID
+							 , MEM_PASS
+							 , MEM_HP
+							 , MEM_MAIL
+							 , MEM_BIR
+							 , MEM_ZIP
+							 , MEM_ADDR1
+							 , MEM_ADDR2
+							 , MS_CD
+							 , MEM_MILEAGE
+							 , JOIN_DATE
+							 , MANAGER_YN
+							 , DELETE_YN
+							 , MEM_IMG)
+		VALUES (#memCd#
+			  , #memName#
+			  , #memId#
+			  , #memPass#
+			  , #memHp#
+			  , #memMail#
+			  , #memBir#
+			  , #memZip#
+			  , #memAddr1#
+			  , #memAddr2#
+			  , 'MS01'
+			  , 0
+			  , SYSDATE
+			  , 'N'
+			  , 'N'
+			  , NULL)
+	</insert>
+		
+</sqlMap>			
+
+
+
+
+
+
+
+
+
